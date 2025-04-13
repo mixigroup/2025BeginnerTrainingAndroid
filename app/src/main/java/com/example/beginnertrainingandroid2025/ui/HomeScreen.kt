@@ -15,9 +15,28 @@ import com.example.beginnertrainingandroid2025.ui.theme.BeginnerTrainingAndroid2
 import kotlin.random.Random
 import kotlin.random.nextInt
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    modifier: Modifier = Modifier,
+) {
+    val repos = List(1000) {
+        Repo(
+            id = it,
+            name = "repo$it",
+            description = if (it.mod(2) == 0) "This is awesome repository" else null,
+            stars = Random.nextInt(IntRange(0, 1000)),
+        )
+    }
+
+    HomeScreen(
+        repos = repos,
+        modifier = modifier,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeScreen(
     repos: List<Repo>,
     modifier: Modifier = Modifier,
 ) {
