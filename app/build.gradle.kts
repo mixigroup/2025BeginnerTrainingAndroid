@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.konan.properties.loadProperties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -16,6 +18,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // local.propertiesを読み込む
+        val properties =
+            properties.apply {
+                loadProperties(project.rootProject.file("local.properties").path)
+            }
+
+        // BuildConfigに値をセット
+        buildConfigField("String", "GITHUB_API_KEY", "\"${properties["GITHUB_API_KEY"]}\"")
     }
 
     buildTypes {
@@ -35,6 +46,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true // BuildConfigを生成するフラグ
         compose = true
     }
 }
