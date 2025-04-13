@@ -8,10 +8,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.beginnertrainingandroid2025.data.Repo
+import com.example.beginnertrainingandroid2025.data.httpClient
 import com.example.beginnertrainingandroid2025.ui.theme.BeginnerTrainingAndroid2025Theme
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -19,13 +27,13 @@ import kotlin.random.nextInt
 fun HomeScreen(
     modifier: Modifier = Modifier,
 ) {
-    val repos = List(1000) {
-        Repo(
-            id = it,
-            name = "repo$it",
-            description = if (it.mod(2) == 0) "This is awesome repository" else null,
-            stars = Random.nextInt(IntRange(0, 1000)),
-        )
+    val repos = remember { mutableStateListOf<Repo>() }
+
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) {
+            val result: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
+            repos.addAll(result)
+        }
     }
 
     HomeScreen(
