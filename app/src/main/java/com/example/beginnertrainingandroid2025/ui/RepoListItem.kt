@@ -43,7 +43,7 @@ fun RepoListItem(
 
 @Preview(showBackground = true)
 @Composable
-fun RepoListItemPreview() {
+private fun RepoListItemPreview() {
     BeginnerTrainingAndroid2025Theme {
         RepoListItem(
             repo = Repo(
