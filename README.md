@@ -981,7 +981,8 @@ data class Repo(
 
   - ものによっては大量に候補が出てきますが、大体は@Composable がついているものを選択すれば大丈夫なはずです
 
-![スクリーンショット 2025-04-07 16.35.44.png](attachment:e759dc1b-68c2-4f57-b52c-d76435c12077:スクリーンショット_2025-04-07_16.35.44.png)
+![image](https://github.com/user-attachments/assets/d7b0800b-6e98-4814-ae2b-b28dcff3036a)
+
 
 <details>
 
