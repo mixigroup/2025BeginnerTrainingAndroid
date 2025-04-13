@@ -983,7 +983,6 @@ data class Repo(
 
 ![image](https://github.com/user-attachments/assets/d7b0800b-6e98-4814-ae2b-b28dcff3036a)
 
-
 <details>
 
 <summary>解説</summary>
@@ -1502,118 +1501,122 @@ JSON パーサー（kotlin serialization）は以下のプラグインを導入�
 
   ![image](https://github.com/user-attachments/assets/7537aacf-c28a-42a0-a66a-072d6d4d9a27)
 
-- 解説
+<details>
 
-  まず`Ktor`を導入します。
+<summary>解説</summary>
 
-  ```toml
-  # libs.versions.toml
-  [versions]
-  ktorClient = "3.1.0"
+まず`Ktor`を導入します。
 
-  [libraries]
-  ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClient" }
-  ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClient" }
-  ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClient" }
-  ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorClient" }
-  ```
+```toml
+# libs.versions.toml
+[versions]
+ktorClient = "3.1.0"
 
-  次に`app`配下にある`build.gradle.kts`に、toml ファイルに書いたライブラリを書きます。
+[libraries]
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClient" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClient" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClient" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorClient" }
+```
 
-  ```kotlin
-  // app/build.gradle.kts
-  dependencies {
-      ...
-      implementation(libs.ktor.client.core)
-      implementation(libs.ktor.client.cio)
-      implementation(libs.ktor.client.content.negotiation)
-      implementation(libs.ktor.serialization.kotlinx.json)
-      ...
-  ```
+次に`app`配下にある`build.gradle.kts`に、toml ファイルに書いたライブラリを書きます。
 
-  プラグインなので、さっきとは違い`[plugins]`の中に書きます。
-
-  ```toml
-  # libs.versions.toml
-  [plugins]
-  ...
-  kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-  ```
-
-  プロジェクトルートにある`build.gradle.kts`と`app`配下にある両方に plugin を追加します。
-
-  ```kotlin
-  // build.gradle.kts
-  plugins {
-      ...
-      alias(libs.plugins.kotlin.serialization) apply false
-  }
-
-  // app/build.gradle.kts
-  plugins {
-      ...
-      alias(libs.plugins.kotlin.serialization)
-  }
-
-  ```
-
-  `Repo`クラスを JSON レスポンスから変換できるようにします。JSON をパースしてオブジェクトに変換するには`@Serializable`をつければ OK です。ただし、JSON のキー名は一致させる必要があります。JSON キーがスネークケースなどプロパティ名を一致させるのが難しい場合は、`@SerialName`を使いましょう。
-
-  ```diff
-  +@Serializable
-   data class Repo(
-       val id: Int,
-       val name: String,
-       val description: String? = null,
-  -    val stars: Int,
-  +    @SerialName("stargazers_count") val stars: Int,
-   )
-  ```
-
-  プレビューではネットワーク通信ができません。なので`HomeScreen`を`MainActivity`で呼び出し、実機で表示できるようにしておきます。また、Android アプリは事前に「このアプリはインターネット通信をします」という宣言をしておかないと、通信できません。この状態でアプリを起動してもクラッシュします。なので、`AndroidManifest.xml`に以下を追記します。
-
-  ```xml
-  <uses-permission android:name="android.permission.INTERNET" />
-
-  <application
+```kotlin
+// app/build.gradle.kts
+dependencies {
     ...
-  ```
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    ...
+```
 
-  HTTP クライアントを使って`GET`してみます。
+プラグインなので、さっきとは違い`[plugins]`の中に書きます。
 
-  get メソッドは suspend 関数のため、呼び出すには Coroutine Scope が必要です。Composable 関数内で Coroutine を起動するには、`LaunchedEffect`を使います。（※ LaunchedEffect はネットワーク処理をするための Composable 関数ではありませんが、まずは通信できることを確認したいので許容します）
+```toml
+# libs.versions.toml
+[plugins]
+...
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+```
 
-  ```diff
-   ) {
-  +    LaunchedEffect(Unit) {
-  +        val result: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-  +    }
-  +
-       HomeScreen(
-           modifier = modifier,
-           items = emptyList(),
-  ```
+プロジェクトルートにある`build.gradle.kts`と`app`配下にある両方に plugin を追加します。
 
-  取得したリポジトリを表示できるようにしましょう。`List<Repo>`を監視して、取得に成功したら更新するようにします。監視するためには State オブジェクトにします。また、remember を使って Recomposition で関数が再実行されても値を記憶させます。
+```kotlin
+// build.gradle.kts
+plugins {
+    ...
+    alias(libs.plugins.kotlin.serialization) apply false
+}
 
-  ```diff
-   fun HomeScreen(
-       modifier: Modifier = Modifier,
-   ) {
-  +    var items = remember { mutableStateListOf<Repo>() }
-  +
-       LaunchedEffect(Unit) {
-           val result: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-  +        items.addAll(result)
-       }
+// app/build.gradle.kts
+plugins {
+    ...
+    alias(libs.plugins.kotlin.serialization)
+}
 
-       HomeScreen(
-           modifier = modifier,
-  -        items = emptyList(),
-  +        items = items,
-       )
-   }
-  ```
+```
+
+`Repo`クラスを JSON レスポンスから変換できるようにします。JSON をパースしてオブジェクトに変換するには`@Serializable`をつければ OK です。ただし、JSON のキー名は一致させる必要があります。JSON キーがスネークケースなどプロパティ名を一致させるのが難しい場合は、`@SerialName`を使いましょう。
+
+```diff
++@Serializable
+ data class Repo(
+     val id: Int,
+     val name: String,
+     val description: String? = null,
+-    val stars: Int,
++    @SerialName("stargazers_count") val stars: Int,
+ )
+```
+
+プレビューではネットワーク通信ができません。なので`HomeScreen`を`MainActivity`で呼び出し、実機で表示できるようにしておきます。また、Android アプリは事前に「このアプリはインターネット通信をします」という宣言をしておかないと、通信できません。この状態でアプリを起動してもクラッシュします。なので、`AndroidManifest.xml`に以下を追記します。
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+
+<application
+  ...
+```
+
+HTTP クライアントを使って`GET`してみます。
+
+get メソッドは suspend 関数のため、呼び出すには Coroutine Scope が必要です。Composable 関数内で Coroutine を起動するには、`LaunchedEffect`を使います。（※ LaunchedEffect はネットワーク処理をするための Composable 関数ではありませんが、まずは通信できることを確認したいので許容します）
+
+```diff
+ ) {
++    LaunchedEffect(Unit) {
++        val result: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
++    }
++
+     HomeScreen(
+         modifier = modifier,
+         items = emptyList(),
+```
+
+取得したリポジトリを表示できるようにしましょう。`List<Repo>`を監視して、取得に成功したら更新するようにします。監視するためには State オブジェクトにします。また、remember を使って Recomposition で関数が再実行されても値を記憶させます。
+
+```diff
+ fun HomeScreen(
+     modifier: Modifier = Modifier,
+ ) {
++    var items = remember { mutableStateListOf<Repo>() }
++
+     LaunchedEffect(Unit) {
+         val result: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
++        items.addAll(result)
+     }
+
+     HomeScreen(
+         modifier = modifier,
+-        items = emptyList(),
++        items = items,
+     )
+ }
+```
+
+</details>
 
 ## Step 5 : アプリアーキテクチャの導入
 
