@@ -12,3 +12,18 @@ fun RepoListItem(
 ) {
 
 }
+
+@Preview(showBackground = true)
+@Composable
+fun RepoListItemPreview() {
+    BeginnerTrainingAndroid2025Theme {
+        RepoListItem(
+            repo = Repo(
+                id = 123,
+                name = "foo",
+                description = "This is awesome repository.",
+                stars = 123,
+            ),
+        )
+    }
+}
