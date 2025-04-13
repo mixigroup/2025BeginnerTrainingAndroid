@@ -1087,6 +1087,9 @@ data class Repo(
              fontWeight = FontWeight.Bold,
 ```
 
+実装例として下記に実装しています。参考にしてみてください。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/main...reference/step-1
+
 </details>
 
 ### テクニック
@@ -1166,6 +1169,9 @@ LazyColumn(modifier = modifier) {
 
 Step 2 のコードを実装して、プレビューでリポジトリの一覧を表示できることを確認しましょう。
 
+実装例として下記に実装しています。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-1...reference/step-2
+
 ## Step 3: 画面のタイトルを表示する
 
 デバイスでリポジトリを表示してみると、OS のステータスバーと被って表示されてしまいました。一般的なアプリは画面の最上部にスペースを開けて、その画面の機能やメニューなどを表示できるようにテキストやアイコンを表示しているでしょう。Compose ではそのようなレイアウトが簡単に実装できるような API が公開されています。それが`Scaffold`です。
@@ -1222,6 +1228,9 @@ Scaffold(
 ### **演習**
 
 Step 3 のコードを実装して、デバイスにリポジトリの一覧を表示できることを確認しましょう。
+
+実装例として下記に実装しています。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-2...reference/step-3
 
 ## Step 4 : サーバーからリポジトリを取得する
 
@@ -1615,6 +1624,9 @@ get メソッドは suspend 関数のため、呼び出すには Coroutine Scope
      )
  }
 ```
+
+実装例として下記に実装しています。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-3...reference/step-4
 
 </details>
 
