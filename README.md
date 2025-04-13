@@ -2222,186 +2222,190 @@ bookmark_repos {
 repos ||--|| bookmark_repos : ""
 ```
 
-- 解説
+<details>
 
-  依存を追加します。
+<summary>解説</summary>
 
-  ```toml
-  [versions]
-  room = "2.6.1"
-  ksp = "2.0.21-1.0.27"
+依存を追加します。
 
-  [libraries]
-  androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-  androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
-  androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+```toml
+[versions]
+room = "2.6.1"
+ksp = "2.0.21-1.0.27"
 
-  [plugins]
-  ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-  ```
+[libraries]
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 
-  ```kotlin
+[plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+```
 
-  // build.gradle.kts
-  plugins {
-      alias(libs.plugins.ksp) apply false
-  }
+```kotlin
 
-  // app/build.gradle.kts
-  plugins {
-      alias(libs.plugins.ksp)
-  }
+// build.gradle.kts
+plugins {
+    alias(libs.plugins.ksp) apply false
+}
 
-  dependencies {
-      implementation(libs.androidx.room.runtime)
-      ksp(libs.androidx.room.compiler)
-      implementation(libs.androidx.room.ktx)
-  }
-  ```
+// app/build.gradle.kts
+plugins {
+    alias(libs.plugins.ksp)
+}
 
-  Room ではスキーマを Kotlin のオブジェクトで表現できます。
+dependencies {
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+}
+```
 
-  ```kotlin
-  @Entity(
-      tableName = "repo",
-  )
-  data class RepoEntity(
-      @PrimaryKey val id: Int,
-      val name: String,
-      val about: String? = null,
-      val stars: Int,
-  )
-  ```
+Room ではスキーマを Kotlin のオブジェクトで表現できます。
 
-  ```kotlin
-  @Entity(
-      tableName = "bookmark_repo",
-      primaryKeys = ["repo_id"],
-      foreignKeys = [
-          ForeignKey(
-              entity = RepoEntity::class,
-              parentColumns = ["id"],
-              childColumns = ["repo_id"],
-              onDelete = ForeignKey.CASCADE,
-          )
-      ]
-  )
-  data class BookmarkRepoEntity(
-      @ColumnInfo("repo_id") val repoId: Int,
-  )
-  ```
+```kotlin
+@Entity(
+    tableName = "repo",
+)
+data class RepoEntity(
+    @PrimaryKey val id: Int,
+    val name: String,
+    val about: String? = null,
+    val stars: Int,
+)
+```
 
-  データベースを定義します。さきほど定義したスキーマオブジェクトを渡します。
+```kotlin
+@Entity(
+    tableName = "bookmark_repo",
+    primaryKeys = ["repo_id"],
+    foreignKeys = [
+        ForeignKey(
+            entity = RepoEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["repo_id"],
+            onDelete = ForeignKey.CASCADE,
+        )
+    ]
+)
+data class BookmarkRepoEntity(
+    @ColumnInfo("repo_id") val repoId: Int,
+)
+```
 
-  ```kotlin
-  @Database(
-      entities = [
-          RepoEntity::class,
-          BookmarkRepoEntity::class,
-      ],
-      version = 1,
-  )
-  abstract class AppDatabase : RoomDatabase() {
-      abstract fun repoDao(): RepoDao
-  }
-  ```
+データベースを定義します。さきほど定義したスキーマオブジェクトを渡します。
 
-  DAO を実装します。
+```kotlin
+@Database(
+    entities = [
+        RepoEntity::class,
+        BookmarkRepoEntity::class,
+    ],
+    version = 1,
+)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun repoDao(): RepoDao
+}
+```
 
-  ```kotlin
-  @Dao
-  interface RepoDao {
-      @Query("SELECT * FROM repo")
-      suspend fun findAll(): List<RepoEntity>
+DAO を実装します。
 
-      @Insert
-      suspend fun insertAll(vararg repos: RepoEntity)
+```kotlin
+@Dao
+interface RepoDao {
+    @Query("SELECT * FROM repo")
+    suspend fun findAll(): List<RepoEntity>
 
-      @Insert
-      suspend fun insertBookmark(repo: BookmarkRepoEntity)
+    @Insert
+    suspend fun insertAll(vararg repos: RepoEntity)
 
-      @Delete
-      suspend fun deleteBookmark(repo: BookmarkRepoEntity)
+    @Insert
+    suspend fun insertBookmark(repo: BookmarkRepoEntity)
 
-      @Query("""
-          SELECT *
-          FROM repo
-          WHERE id IN bookmark_repo
-      """)
-      suspend fun findAllBookmark(): List<RepoEntity>
-  }
-  ```
+    @Delete
+    suspend fun deleteBookmark(repo: BookmarkRepoEntity)
 
-  これで DAO を使う準備ができました。それでは LocalDataSource を作成します。
+    @Query("""
+        SELECT *
+        FROM repo
+        WHERE id IN bookmark_repo
+    """)
+    suspend fun findAllBookmark(): List<RepoEntity>
+}
+```
 
-  ```kotlin
-  class GithubRepoLocalDataSource(
-      private val dao: RepoDao,
-  ) {
-      suspend fun saveRepoList(repoList: List<Repo>) {
-          dao.insertAll(*repoList.map { it.toEntity() }.toTypedArray())
-      }
+これで DAO を使う準備ができました。それでは LocalDataSource を作成します。
 
-      suspend fun saveAsBookmark(repo: Repo) {
-          dao.insertBookmark(repo.toBookmarkEntity())
-      }
+```kotlin
+class GithubRepoLocalDataSource(
+    private val dao: RepoDao,
+) {
+    suspend fun saveRepoList(repoList: List<Repo>) {
+        dao.insertAll(*repoList.map { it.toEntity() }.toTypedArray())
+    }
 
-      suspend fun saveAsUnBookmark(repo: Repo) {
-          dao.deleteBookmark(repo.toBookmarkEntity())
-      }
+    suspend fun saveAsBookmark(repo: Repo) {
+        dao.insertBookmark(repo.toBookmarkEntity())
+    }
 
-      suspend fun getBookmarkRepoListFlow(): List<Repo> {
-          return dao.findAllBookmark().map { it.toModel() }
-      }
-  }
-  ```
+    suspend fun saveAsUnBookmark(repo: Repo) {
+        dao.deleteBookmark(repo.toBookmarkEntity())
+    }
 
-  Repository を修正します。
+    suspend fun getBookmarkRepoListFlow(): List<Repo> {
+        return dao.findAllBookmark().map { it.toModel() }
+    }
+}
+```
 
-  ```kotlin
-  class GithubRepoRepository(
-      private val localDataSource: GithubRepoLocalDataSource,
-      private val remoteDataSource: GithubRepoRemoteDataSource,
-  ) {
-      suspend fun getRepoList(): List<Repo> {
-          return localDataSource.getRepoList().ifEmpty {
-              val repoList = remoteDataSource.fetchRepoList().map { it.toModel() }
-              localDataSource.saveRepoList(repoList)
-              repoList
-          }
-      }
+Repository を修正します。
 
-      suspend fun saveAsBookmark(repo: Repo) {
-          localDataSource.saveAsBookmark(repo)
-      }
+```kotlin
+class GithubRepoRepository(
+    private val localDataSource: GithubRepoLocalDataSource,
+    private val remoteDataSource: GithubRepoRemoteDataSource,
+) {
+    suspend fun getRepoList(): List<Repo> {
+        return localDataSource.getRepoList().ifEmpty {
+            val repoList = remoteDataSource.fetchRepoList().map { it.toModel() }
+            localDataSource.saveRepoList(repoList)
+            repoList
+        }
+    }
 
-      suspend fun saveAsUnBookmark(repo: Repo) {
-          localDataSource.saveAsUnBookmark(repo)
-      }
+    suspend fun saveAsBookmark(repo: Repo) {
+        localDataSource.saveAsBookmark(repo)
+    }
 
-      suspend fun getBookmarkedRepoList(): List<Repo> {
-          return localDataSource.getBookmarkRepoList()
-      }
-  }
-  ```
+    suspend fun saveAsUnBookmark(repo: Repo) {
+        localDataSource.saveAsUnBookmark(repo)
+    }
 
-  ViewModel を修正してブックマークしたリポジトリを永続化します。
+    suspend fun getBookmarkedRepoList(): List<Repo> {
+        return localDataSource.getBookmarkRepoList()
+    }
+}
+```
 
-  ```kotlin
-      fun onBookmarkIconClick(item: Repo) {
-          viewModelScope.launch {
-              uiState.update {
-                  if (item in uiState.value.bookmarkedItems) {
-                      repository.saveAsUnBookmark(item)
-                  } else {
-                      repository.saveAsBookmark(item)
-                  }
+ViewModel を修正してブックマークしたリポジトリを永続化します。
 
-                  it.copy(bookmarkedItems = repository.getBookmarkedRepoListFlow().first().toSet())
-              }
-          }
-      }
-  ```
+```kotlin
+    fun onBookmarkIconClick(item: Repo) {
+        viewModelScope.launch {
+            uiState.update {
+                if (item in uiState.value.bookmarkedItems) {
+                    repository.saveAsUnBookmark(item)
+                } else {
+                    repository.saveAsBookmark(item)
+                }
+
+                it.copy(bookmarkedItems = repository.getBookmarkedRepoListFlow().first().toSet())
+            }
+        }
+    }
+```
+
+</details>
 
 ## Step 8: ブックマーク画面への遷移処理を実装する
 
