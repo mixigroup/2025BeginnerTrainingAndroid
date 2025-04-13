@@ -816,7 +816,7 @@ Column {
 </td>
 <td>
 
-![image.png](attachment:8956a577-6d93-4464-b5b8-8248c34cbd9f:image.png)
+<img width="169" alt="スクリーンショット 2025-04-14 4 20 02" src="https://github.com/user-attachments/assets/9e015cd7-1688-4e22-bb67-1078c4df6184" />
 
 </td>
 </tr>
@@ -841,6 +841,8 @@ Column(
 </td>
 <td>
 
+<img width="166" alt="スクリーンショット 2025-04-14 4 20 27" src="https://github.com/user-attachments/assets/a81dd4fd-077f-4766-9049-faf06bbb552d" />
+
 </td>
 </tr>
 </table>
@@ -862,6 +864,8 @@ Row {
 
 </td>
 <td>
+
+<img width="252" alt="スクリーンショット 2025-04-14 4 20 51" src="https://github.com/user-attachments/assets/ff5bde98-3c48-423e-90b0-6f08c410b041" />
 
 </td>
 </tr>
@@ -886,6 +890,8 @@ Row(
 </td>
 <td>
 
+<img width="263" alt="スクリーンショット 2025-04-14 4 21 23" src="https://github.com/user-attachments/assets/71cac264-d9bf-44e1-b2d3-2351e0556adf" />
+
 </td>
 </tr>
 </table>
@@ -908,6 +914,8 @@ Box {
 </td>
 <td>
 
+<img width="167" alt="スクリーンショット 2025-04-14 4 21 45" src="https://github.com/user-attachments/assets/08dd2063-7b22-42df-a887-9d2e5da6f28d" />
+
 </td>
 </tr>
 </table>
@@ -929,6 +937,8 @@ Box(
 
 </td>
 <td>
+
+<img width="167" alt="スクリーンショット 2025-04-14 4 22 11" src="https://github.com/user-attachments/assets/54765c0b-ae8d-4214-b946-5d27eacac789" />
 
 </td>
 </tr>
@@ -1113,7 +1123,7 @@ private fun RepoListItemPreview(
 
 次にリポジトリをリストで表示できるようにしてみましょう。
 
-![スクリーンショット 2025-04-06 23.32.41.png](attachment:d02a2eb2-7ef5-4cd1-8bc3-5df9623f1d5f:スクリーンショット_2025-04-06_23.32.41.png)
+![image](https://github.com/user-attachments/assets/bf4c9450-c69f-42bb-bcd0-f8e77fd826bc)
 
 リポジトリを一覧できる画面をホーム画面と呼ぶことにします。まずは、ホーム画面の UI を記述する Composable 関数を作成します。よく使われる命名としては`{画面名}Screen`です。今回は`HomeScreen`という命名で作成します。
 
@@ -1266,7 +1276,7 @@ BuildConfig.GITHUB_API_KEY // これでトークンを取得できる
 
 Android では、5 秒間メインスレッドがブロックされると ANR（Application Not Responding）が発生します。ANR が発生するアプリ = 品質の低いアプリと評価され、Google Play の内部アルゴリズムによってアプリをユーザーが見つけにくくなってしまいます（[公式資料](https://developer.android.com/topic/performance/vitals/anr#android-vitals)）。ビジネス的にも悪い影響を及ぼすので、なるべく ANR が発生しないようにちゃんと非同期で処理してあげましょう。
 
-[画面収録 2025-04-03 16.03.21.mov](attachment:f2434485-eb78-416a-8d49-1879dcaff0af:画面収録_2025-04-03_16.03.21.mov)
+https://github.com/user-attachments/assets/df368485-1a28-4cb5-b557-c3068d79b181
 
 ### Kotlin Coroutines による非同期処理
 
@@ -1479,13 +1489,14 @@ JSON パーサー（kotlin serialization）は以下のプラグインを導入�
 
   - `Replace new library catalog declaration …` をクリックします
 
-    ![スクリーンショット 2025-04-06 23.20.31.png](attachment:8b522a76-e7c7-48ff-9515-91c1abfcd459:スクリーンショット_2025-04-06_23.20.31.png)
+	![image](https://github.com/user-attachments/assets/d7bbf0f2-2785-4cf1-ae8d-6461dba4a768)
+
 
   - 自動的に toml ファイルへ移行してくれます
 
 - ライブラリの追加などで gradle（ビルドシステムのこと）のスクリプトを修正すると、下記のように通知が表示されます。これが表示されたらとりあえず`Sync Now`をクリックすると良いです。ライブラリの追加やバージョンを変更したなら、該当ライブラリの DL を自動で実行してくれます。
 
-  ![スクリーンショット 2025-03-28 4.17.12.png](attachment:ea6849ca-23f5-49bd-a371-130daf9ebeed:スクリーンショット_2025-03-28_4.17.12.png)
+  ![image](https://github.com/user-attachments/assets/7537aacf-c28a-42a0-a66a-072d6d4d9a27)
 
 - 解説
 
@@ -1882,11 +1893,11 @@ ListItem(onClick = { viewModel.onClick() })
 
 +アイコンをクリック（青矢印）して、Import Drawables でアイコンを取り込みましょう（橙矢印）。
 
-![スクリーンショット 2025-04-07 11.29.10.png](attachment:8f35b7d2-ba0b-4969-b8bd-d194b1237065:スクリーンショット_2025-04-07_11.29.10.png)
+![image](https://github.com/user-attachments/assets/95681e38-2749-45a4-be41-b67c4acef5c1)
 
 ファイルを選択すると下記のように取り込んだアイコンが表示されます。
 
-![スクリーンショット 2025-04-07 11.29.36.png](attachment:11056fc4-b5bd-495a-aef9-98e6a59b6a74:スクリーンショット_2025-04-07_11.29.36.png)
+![image](https://github.com/user-attachments/assets/93891494-536e-4215-80f4-1ac60d8a8fb8)
 
 赤枠はリソースの名前です。コードから呼び出すときはここに設定した名前で`R.drawable.icon_name`のようにアクセスします。
 
@@ -1896,7 +1907,7 @@ drawable には画像も追加できます。コードでアクセスした時�
 
 ブックマークアイコンをタップすると、タップされた状態を反映するようにしてください。データの永続化は考慮しなくて良いです。
 
-[画面収録 2025-04-07 4.57.23.mov](attachment:8803bee0-91ed-4142-b5ea-4542cbd1219d:画面収録_2025-04-07_4.57.23.mov)
+https://github.com/user-attachments/assets/defa3890-2422-4a2f-a227-902a3fe7fd89
 
 - 解説
 
@@ -2571,7 +2582,7 @@ fun BeginnerTrainingApp(
 
 UI テストのような実デバイス上で実行したいテストは、赤枠の場所におきます。単体テストのようなローカルで実行したいテストは青枠の場所におきます。
 
-![スクリーンショット 2025-04-09 13.48.17.png](attachment:f1165d4e-2fb0-48c2-99a4-3a74f58aff23:スクリーンショット_2025-04-09_13.48.17.png)
+![image](https://github.com/user-attachments/assets/dc15651b-0e74-4361-aa5e-3c823df91cec)
 
 **テストファイルの作り方**
 
@@ -2579,15 +2590,15 @@ UI テストのような実デバイス上で実行したいテストは、赤�
 
 もしくは、テスト対象のクラスで Opt + Enter から Create test を選択すればテストファイルを作成してくれます。
 
-![スクリーンショット 2025-04-09 14.11.39.png](attachment:e4b8a84a-28ef-4aa1-bf07-bfc8e28de72d:スクリーンショット_2025-04-09_14.11.39.png)
+![image](https://github.com/user-attachments/assets/1fb68d00-9a5b-4408-8f4c-f919be0527cc)
 
 Member のところでチェックしたメソッドはファイル作成と同時にテストメソッドを作成してくれます。
 
-![スクリーンショット 2025-04-09 14.15.15.png](attachment:a5bc83d0-7749-4cee-b716-9af97ffbf82e:スクリーンショット_2025-04-09_14.15.15.png)
+![image](https://github.com/user-attachments/assets/3f121d8e-6d78-489e-85e1-172fdf3e4a38)
 
 実デバイスで実行したい場合は、androidTest を選択してください。ローカルで実行したい場合はそのままで ok です。（以下の説明はすべてローカルテストです。ただデバイステストでも大体一緒です。）
 
-![スクリーンショット 2025-04-09 14.12.16.png](attachment:4dd53348-9024-4bd9-a11b-2bb5a3f61a23:スクリーンショット_2025-04-09_14.12.16.png)
+![image](https://github.com/user-attachments/assets/5d40ab68-85e3-4cda-82a2-af6d0e88b00c)
 
 OK を押すとこんな感じでテストファイルが作成されます。
 
@@ -2605,17 +2616,28 @@ class HomeViewModelTest {
 
 class の横にある方はそのクラスのすべてのテストを実行します。テストメソッドごとに表示されている方は、紐づいているテストだけを実行できます。
 
-![スクリーンショット 2025-04-09 14.57.29.png](attachment:7cd26744-b967-4be8-b483-92f4f6312e1e:スクリーンショット_2025-04-09_14.57.29.png)
+<table>
+<tr>
+<td>
 
-![スクリーンショット 2025-04-09 14.57.42.png](attachment:6aa3917c-db30-44b8-be39-70478bc19968:スクリーンショット_2025-04-09_14.57.42.png)
+![image](https://github.com/user-attachments/assets/ccccb673-49e1-4331-b0e8-fa50b54aff31)
+
+</td>
+<td>
+
+![image](https://github.com/user-attachments/assets/2b06eeca-368b-4279-b421-579987acbdc3)
+
+</td>
+</tr>
+</table>
 
 テストが通ると下記のように詳細が表示されます。
 
-![スクリーンショット 2025-04-09 14.57.56.png](attachment:2e4c9880-3596-4bd7-8a1f-ec5a9f8c0eb1:スクリーンショット_2025-04-09_14.57.56.png)
+![image](https://github.com/user-attachments/assets/ea999d9f-d655-4340-9adb-a32721b7cc25)
 
 テストが失敗するとこんな感じになります。
 
-![スクリーンショット 2025-04-09 14.58.28.png](attachment:c8017f31-3199-4090-8a3a-bfe25d2d6a81:スクリーンショット_2025-04-09_14.58.28.png)
+![image](https://github.com/user-attachments/assets/766af783-1a80-4f93-a5c4-6c1d01d1ebb7)
 
 ### フェイクオブジェクトを使う
 
