@@ -1662,7 +1662,6 @@ https://developer.android.com/topic/architecture
 flowchart TD;
 
 UI層 --> Data層
-
 ```
 
 **UI 層**
