@@ -641,17 +641,10 @@ public fun ComponentActivity.setContent(
 
 引数を`Hello, World!`から`Bye!`に変更すると自動的に反映されるイメージです
 
-```kotlin
-Text(text = "Hello, World!")
-```
-
-![image.png](attachment:07668df2-85c5-4409-b5f9-909b326b717e:image.png)
-
-```kotlin
-Text(text = "Bye!")
-```
-
-![image.png](attachment:3f6908d2-a457-4cf7-befb-09ca04fc3754:image.png)
+|||
+|---|---|
+|<img width="250" alt="スクリーンショット 2025-04-14 3 48 27" src="https://github.com/user-attachments/assets/8bd51263-1056-483e-894f-aee43d005eb6" />|<img width="206" alt="スクリーンショット 2025-04-14 3 45 31" src="https://github.com/user-attachments/assets/05e2b870-54fb-41fa-b495-965a06e67101" />|
+|<img width="199" alt="スクリーンショット 2025-04-14 3 48 34" src="https://github.com/user-attachments/assets/a4aec70a-d575-4716-abd3-926e8bda12d2" />|<img width="71" alt="スクリーンショット 2025-04-14 3 45 59" src="https://github.com/user-attachments/assets/e6f20377-58fa-40ad-8048-dcc554e4bd77" />|
 
 しかし、ただのオブジェクトを変更しても Compose は変更を検知してくれません。`State型`もしくは`MutableState型`にすることで、Compose がよしなに変更を検知してくれます。
 
@@ -697,7 +690,7 @@ fun ClickableText() {
 }
 ```
 
-[画面収録 2025-04-03 13.43.33.mov](attachment:be3b6c09-2881-4c7b-ae23-57a86f06407c:画面収録_2025-04-03_13.43.33.mov)
+https://github.com/user-attachments/assets/14d0bb84-2904-492e-ab6a-2159c42c716e
 
 ### **プレビュー機能**
 
@@ -725,32 +718,46 @@ fun CountButtonPreview() {
 
 では、プレビューを表示してみましょう。右上の Split をクリックすれば右側に表示されます。
 
-![スクリーンショット 2025-04-03 14.26.05.png](attachment:ee50265e-4cb1-4f8f-bc2b-7e1680ff5114:スクリーンショット_2025-04-03_14.26.05.png)
+![image](https://github.com/user-attachments/assets/4f5ccfab-d768-4b78-9f99-9866df79bf49)
 
 プレビューは差分を検知して自動で更新してくれます。`Text`に渡している文字列を変更してみてください。プレビューにも自動で反映されたと思います。
 
 また、`Interactive Mode`にすると動的な部分もプレビューでチェックできます。
 
-![スクリーンショット 2025-04-03 14.29.23.png](attachment:a301017f-0598-4bd6-b4e0-1b4f89b4a5bc:スクリーンショット_2025-04-03_14.29.23.png)
+![image](https://github.com/user-attachments/assets/cca67428-9319-4a5d-a359-01e93fa3f7f6)
 
-[画面収録 2025-04-03 14.30.48.mov](attachment:5d80e921-827c-4ac9-8c1d-bed964efb09a:画面収録_2025-04-03_14.30.48.mov)
+https://github.com/user-attachments/assets/cf2fb00a-73a8-43c6-bae2-29bda4c0e58e
 
 ## Step 1 : リポジトリを表示する
 
 このステップでは、以下の UI を表示する Composable 関数を実装します。
 
-![image.png](attachment:40484c0e-b5df-45ee-84a7-295e14f9e833:image.png)
+<img width="423" alt="スクリーンショット 2025-04-14 3 52 15" src="https://github.com/user-attachments/assets/7bf05a1e-347e-4dc2-8f77-e6665f2bbb64" />
 
 ### Compose でレイアウトを組む
 
 Composable 関数をただ並べても、同じ場所に表示されてしまい UI が重なってしまいます。
+
+<table>
+<tr>
+<td> コード </td> <td> Preview </td>
+</tr>
+<tr>
+<td>
 
 ```kotlin
 Text("hello")
 Text("world")
 ```
 
-![スクリーンショット 2025-04-06 20.34.39.png](attachment:e3927260-15b9-4769-9532-7e94b7bb76d5:スクリーンショット_2025-04-06_20.34.39.png)
+</td>
+<td>    
+
+![image](https://github.com/user-attachments/assets/669117f2-3e46-4fa3-9b03-c4d31d6faa18)
+
+</td>
+</tr>
+</table>
 
 Compose で UI を並べるには`Column`、`Row`、`Box`を使えば良いです。
 
