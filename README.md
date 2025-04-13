@@ -2759,122 +2759,126 @@ ViewModel では Repository の interface を受け取るようにして、テ�
 
 HomeViewModel の単体テストを書いてみましょう。
 
-- 解説
+<details>
 
-  テストファイルを作成しましょう。
+<summary>解説</summary>
 
-  ```kotlin
-  class HomeViewModelTest {}
-  ```
+テストファイルを作成しましょう。
 
-  `onLaunched`メソッドのテストを書いてみます。
+```kotlin
+class HomeViewModelTest {}
+```
 
-  ```kotlin
-  @Test
-  fun onLaunchedTest() {
-  		val repos = listOf(
-  		        Repo(
-  		            id = 1,
-  		            name = "fake repo1",
-  		            stars = 12,
-  		        ),
-  		        Repo(
-  		            id = 2,
-  		            description = "this is fake repository",
-  		            name = "fake repo2",
-  		            stars = 3,
-  		        ),
-  	  )
+`onLaunched`メソッドのテストを書いてみます。
 
-  	  val viewModel = HomeViewModel(
-  	        repository = FakeGithubRepoRepository(
-                repos = repos,
-                bookmarkedRepos = emptyList(),
-            ),
-  	  )
+```kotlin
+@Test
+fun onLaunchedTest() {
+		val repos = listOf(
+		        Repo(
+		            id = 1,
+		            name = "fake repo1",
+		            stars = 12,
+		        ),
+		        Repo(
+		            id = 2,
+		            description = "this is fake repository",
+		            name = "fake repo2",
+		            stars = 3,
+		        ),
+	  )
 
-  	  viewModel.onLaunched()
+	  val viewModel = HomeViewModel(
+	        repository = FakeGithubRepoRepository(
+              repos = repos,
+              bookmarkedRepos = emptyList(),
+          ),
+	  )
 
-  		assertEquals(
-  		    HomeUiState(
-  		        items = repos,
-  		        bookmarkedItems = emptySet(),
-  		    ),
-  		    viewModel.uiState.value,
-  		)
-  }
-  ```
+	  viewModel.onLaunched()
 
-  この時点でテストを実行しても実はエラーになります。エラー文を読むと Dispatchers.Main が見つからないようです。どこで Dispatchers.Main が使われているかというと、viewModelScope の中で使われています。
+		assertEquals(
+		    HomeUiState(
+		        items = repos,
+		        bookmarkedItems = emptySet(),
+		    ),
+		    viewModel.uiState.value,
+		)
+}
+```
 
-  > Exception in thread "Test worker" java.lang.IllegalStateException: Module with the Main dispatcher had failed to initialize. For tests Dispatchers.setMain from kotlinx-coroutines-test module can be used
+この時点でテストを実行しても実はエラーになります。エラー文を読むと Dispatchers.Main が見つからないようです。どこで Dispatchers.Main が使われているかというと、viewModelScope の中で使われています。
 
-  ではどうすれば良いかというと、テスト用に Dispatchers.Main を書き換えれば ok です。コルーチンのテストライブラリが必要なので、依存を追加します。
+> Exception in thread "Test worker" java.lang.IllegalStateException: Module with the Main dispatcher had failed to initialize. For tests Dispatchers.setMain from kotlinx-coroutines-test module can be used
 
-  ```toml
-  [versions]
-  kotlinxCoroutinesTest = "1.10.2"
+ではどうすれば良いかというと、テスト用に Dispatchers.Main を書き換えれば ok です。コルーチンのテストライブラリが必要なので、依存を追加します。
 
-  [libraries]
-  kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
-  ```
+```toml
+[versions]
+kotlinxCoroutinesTest = "1.10.2"
 
-  ```kotlin
-  testImplementation(libs.kotlinx.coroutines.test)
-  ```
+[libraries]
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+```
 
-  `Dispatchers.Main`を書き換えます。`@Before`をつけたメソッドはテスト毎に最初に呼ばれます。初期化処理などを書くのに便利です。`@After`はテスト毎に終了時に呼ばれます。リソースの解放などの処理を書くのに便利です。
+```kotlin
+testImplementation(libs.kotlinx.coroutines.test)
+```
 
-  ```kotlin
-  class HomeViewModelTest {
-      @Before
-      fun setUp() {
-          Dispatchers.setMain(StandardTestDispatcher())
-      }
+`Dispatchers.Main`を書き換えます。`@Before`をつけたメソッドはテスト毎に最初に呼ばれます。初期化処理などを書くのに便利です。`@After`はテスト毎に終了時に呼ばれます。リソースの解放などの処理を書くのに便利です。
 
-      @After
-      fun tearDown() {
-          Dispatchers.resetMain()
-      }
+```kotlin
+class HomeViewModelTest {
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(StandardTestDispatcher())
+    }
 
-  ...
-  ```
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 
-  とりあえずテストは実行できるようになりました。しかし、意図通りの値が入っておらずテストに失敗しています。原因はフェイクの Repository で`delay`で待っているからです。`delay`が終了するのを待たずにテストが実行されて`assert`で失敗しています。
+...
+```
 
-  > Expected :HomeUiState(items=[Repo(id=1, name=fake repo1, description=null, stars=12), Repo(id=2, name=fake repo2, description=this is fake repository, stars=3)], bookmarkedItems=[])
-  > Actual :HomeUiState(items=[], bookmarkedItems=[])
+とりあえずテストは実行できるようになりました。しかし、意図通りの値が入っておらずテストに失敗しています。原因はフェイクの Repository で`delay`で待っているからです。`delay`が終了するのを待たずにテストが実行されて`assert`で失敗しています。
 
-  どうすれば`delay`の完了を待てるのでしょうか？実は`delay`を良い感じにスキップしてくれるテスト用の API があります。`runTest`です。
+> Expected :HomeUiState(items=[Repo(id=1, name=fake repo1, description=null, stars=12), Repo(id=2, name=fake repo2, description=this is fake repository, stars=3)], bookmarkedItems=[])
+> Actual :HomeUiState(items=[], bookmarkedItems=[])
 
-  ```diff
-   @Test
-  -fun onLaunchedTest() {
-  +fun onLaunchedTest() = runTest {
-                  val repos = listOf(
-                          Repo(
-                              id = 1,
-  ```
+どうすれば`delay`の完了を待てるのでしょうか？実は`delay`を良い感じにスキップしてくれるテスト用の API があります。`runTest`です。
 
-  あとは`assert`の前に時間を進める API を呼んであげれば良いです。
+```diff
+ @Test
+-fun onLaunchedTest() {
++fun onLaunchedTest() = runTest {
+                val repos = listOf(
+                        Repo(
+                            id = 1,
+```
 
-  ```diff
-            )
+あとは`assert`の前に時間を進める API を呼んであげれば良いです。
 
-         viewModel.onLaunched()
-  +      advanceUntilIdle()
+```diff
+          )
 
-         assertEquals(
-            HomeUiState(
-                items = repos,
-                bookmarkedItems = emptySet(),
-            ),
-            viewModel.uiState.value,
-         )
-   }
-  ```
+       viewModel.onLaunched()
++      advanceUntilIdle()
 
-  これでテストが通るようになったと思います。`HomeViewModel#onClickBookmark`も同様にテストを書いてみてください。
+       assertEquals(
+          HomeUiState(
+              items = repos,
+              bookmarkedItems = emptySet(),
+          ),
+          viewModel.uiState.value,
+       )
+ }
+```
+
+これでテストが通るようになったと思います。`HomeViewModel#onClickBookmark`も同様にテストを書いてみてください。
+
+</details>
 
 ## Step 10 : iOS アプリとコードを共有する
 
