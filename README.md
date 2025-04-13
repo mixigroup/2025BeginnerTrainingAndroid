@@ -2121,6 +2121,10 @@ fun onClickBookmark(item: Repo) {
          }
 ```
 
+実装例として下記に実装しています。
+
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-5...reference/step-6
+
 </details>
 
 ## Step 7 : データを端末内に永続化する
