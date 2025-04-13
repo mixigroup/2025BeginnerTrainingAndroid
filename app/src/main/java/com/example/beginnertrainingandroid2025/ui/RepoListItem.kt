@@ -1,4 +1,4 @@
-package com.example.beginnertrainingandroid2025.ui.theme
+package com.example.beginnertrainingandroid2025.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.beginnertrainingandroid2025.data.Repo
+import com.example.beginnertrainingandroid2025.ui.theme.BeginnerTrainingAndroid2025Theme
 
 @Composable
 fun RepoListItem(
