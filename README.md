@@ -1128,7 +1128,7 @@ private fun RepoListItemPreview(
 
 次にリポジトリをリストで表示できるようにしてみましょう。
 
-<img width="300" alt="スクリーンショット 2025-04-14 4 22 11" src="https://github.com/user-attachments/assets/bf4c9450-c69f-42bb-bcd0-f8e77fd826bc" />
+<img width="300" alt="スクリーンショット 2025-04-14 4 22 11" src="https://github.com/user-attachments/assets/d8d23a34-f4ef-4e32-804d-e68621edb265" />
 
 リポジトリを一覧できる画面をホーム画面と呼ぶことにします。まずは、ホーム画面の UI を記述する Composable 関数を作成します。よく使われる命名としては`{画面名}Screen`です。今回は`HomeScreen`という命名で作成します。
 
