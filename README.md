@@ -477,10 +477,9 @@ Finish をクリックします。システムイメージの DL が始まった
 
 まずは、開発者モードを有効にします。設定アプリを開き、デバイス情報を確認できる画面に遷移してください。ビルド番号を 7 回タップすると有効にできます。
 
-|||
-|---|---|
-|![image](https://github.com/user-attachments/assets/dc0a7dde-f684-4102-8d78-bdfb342a26c9)|![image](https://github.com/user-attachments/assets/cee32284-d853-4bbe-9556-9ade6349c2a6)|
-
+|                                                                                           |                                                                                           |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| ![image](https://github.com/user-attachments/assets/dc0a7dde-f684-4102-8d78-bdfb342a26c9) | ![image](https://github.com/user-attachments/assets/cee32284-d853-4bbe-9556-9ade6349c2a6) |
 
 **USB で接続する**
 
@@ -496,9 +495,9 @@ Wi-Fi で接続する場合は、青矢印の部分をクリックします。
 
 二次元コードが表示されるので、設定アプリの開発者オプションから実機で読み取ってください。
 
-|||
-|---|---|
-|![image](https://github.com/user-attachments/assets/dd31a7e6-9864-46ea-b2f1-0c39d124970f)|![image](https://github.com/user-attachments/assets/cee32284-d853-4bbe-9556-9ade6349c2a6)|
+|                                                                                           |                                                                                           |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| ![image](https://github.com/user-attachments/assets/dd31a7e6-9864-46ea-b2f1-0c39d124970f) | ![image](https://github.com/user-attachments/assets/cee32284-d853-4bbe-9556-9ade6349c2a6) |
 
 接続が完了したので、ビルドしてアプリをインストールしてみましょう。インストール先のデバイスを選択し、ビルド対象は app モジュールを選択します。緑色の ▶️ をクリックするとビルドからインストールまで自動で行ってくれます。Ctrl + R でも実行できます。
 
@@ -538,8 +537,9 @@ Compose とは、Google が開発している UI ツールキットです。2021
 
 単にテキストを表示する実装で比較してみます。
 
-<div style="display: flex;">
-  <div style="flex: 1; padding-right: 10px;">
+<table>
+<tr>
+<td>
 
 Android View
 
@@ -556,8 +556,8 @@ val view = findViewById<TextView>(R.id.text)
 view.text = "Hello World!"
 ```
 
-  </div>
-  <div style="flex: 1; padding-left: 10px;">
+</td>
+<td>
 
 Compose
 
@@ -565,8 +565,10 @@ Compose
 Text(text = "Hello World!")
 ```
 
-  </div>
-</div>
+</td>
+</tr>
+
+</table>
 
 Android View では、xml ファイルに表示したいコンポーネントやレイアウトを書きます。データを反映するには Java や Kotlin で、View オブジェクトを操作する必要があります。
 
@@ -641,10 +643,37 @@ public fun ComponentActivity.setContent(
 
 引数を`Hello, World!`から`Bye!`に変更すると自動的に反映されるイメージです
 
-|||
-|---|---|
-|<img width="250" alt="スクリーンショット 2025-04-14 3 48 27" src="https://github.com/user-attachments/assets/8bd51263-1056-483e-894f-aee43d005eb6" />|<img width="206" alt="スクリーンショット 2025-04-14 3 45 31" src="https://github.com/user-attachments/assets/05e2b870-54fb-41fa-b495-965a06e67101" />|
-|<img width="199" alt="スクリーンショット 2025-04-14 3 48 34" src="https://github.com/user-attachments/assets/a4aec70a-d575-4716-abd3-926e8bda12d2" />|<img width="71" alt="スクリーンショット 2025-04-14 3 45 59" src="https://github.com/user-attachments/assets/e6f20377-58fa-40ad-8048-dcc554e4bd77" />|
+<table>
+<tr>
+<td>
+
+```kotlin
+Text(text = "Hello, World!")
+```
+
+</td>
+<td>
+
+<img width="206" alt="スクリーンショット 2025-04-14 3 45 31" src="https://github.com/user-attachments/assets/05e2b870-54fb-41fa-b495-965a06e67101" />
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+```kotlin
+Text(text = "Bye!")
+```
+
+</td>
+<td>
+
+<img width="71" alt="スクリーンショット 2025-04-14 3 45 59" src="https://github.com/user-attachments/assets/e6f20377-58fa-40ad-8048-dcc554e4bd77" />
+
+</td>
+</tr>
+</table>
 
 しかし、ただのオブジェクトを変更しても Compose は変更を検知してくれません。`State型`もしくは`MutableState型`にすることで、Compose がよしなに変更を検知してくれます。
 
@@ -724,9 +753,20 @@ fun CountButtonPreview() {
 
 また、`Interactive Mode`にすると動的な部分もプレビューでチェックできます。
 
+<table>
+<tr>
+<td>
+
 ![image](https://github.com/user-attachments/assets/cca67428-9319-4a5d-a359-01e93fa3f7f6)
 
+</td>
+<td>
+
 https://github.com/user-attachments/assets/cf2fb00a-73a8-43c6-bae2-29bda4c0e58e
+
+</td>
+</tr>
+</table>
 
 ## Step 1 : リポジトリを表示する
 
@@ -740,9 +780,6 @@ Composable 関数をただ並べても、同じ場所に表示されてしまい
 
 <table>
 <tr>
-<td> コード </td> <td> Preview </td>
-</tr>
-<tr>
 <td>
 
 ```kotlin
@@ -751,7 +788,7 @@ Text("world")
 ```
 
 </td>
-<td>    
+<td>
 
 ![image](https://github.com/user-attachments/assets/669117f2-3e46-4fa3-9b03-c4d31d6faa18)
 
@@ -765,6 +802,10 @@ Compose で UI を並べるには`Column`、`Row`、`Box`を使えば良いで�
 
 - 垂直方向に並べたいときに使います
 
+<table>
+<tr>
+<td>
+
 ```kotlin
 Column {
     Square(color = Color.Red, size = 50.dp)
@@ -772,9 +813,20 @@ Column {
 }
 ```
 
+</td>
+<td>
+
 ![image.png](attachment:8956a577-6d93-4464-b5b8-8248c34cbd9f:image.png)
 
+</td>
+</tr>
+</table>
+
 - 並べ方を調整したい時は、`Arrangement`や`Alignment`を設定すると良いです
+
+<table>
+<tr>
+<td>
 
 ```kotlin
 Column(
@@ -786,11 +838,20 @@ Column(
 }
 ```
 
-![image.png](attachment:c196e76e-482a-42b2-b614-f3bffe556ae8:image.png)
+</td>
+<td>
+
+</td>
+</tr>
+</table>
 
 **`Row`**
 
 - 水平方向に並べたいときに使います
+
+<table>
+<tr>
+<td>
 
 ```kotlin
 Row {
@@ -799,9 +860,18 @@ Row {
 }
 ```
 
-![image.png](attachment:eadaf474-5960-428b-a3d4-6afe42aca108:image.png)
+</td>
+<td>
+
+</td>
+</tr>
+</table>
 
 - `Column`と同様に並べ方を調整したい時は、`Arrangement`や`Alignment`を設定すると良いです
+
+<table>
+<tr>
+<td>
 
 ```kotlin
 Row(
@@ -813,11 +883,20 @@ Row(
 }
 ```
 
-![image.png](attachment:87a5cd8b-098e-4153-a72b-53baad9300c7:image.png)
+</td>
+<td>
+
+</td>
+</tr>
+</table>
 
 `Box`
 
 - 重ねて並べたいときに使います
+
+<table>
+<tr>
+<td>
 
 ```kotlin
 Box {
@@ -826,9 +905,18 @@ Box {
 }
 ```
 
-![image.png](attachment:4910a41a-2fdb-4899-9d43-4c52de9b92a1:image.png)
+</td>
+<td>
+
+</td>
+</tr>
+</table>
 
 - `Box`は`Aligment`で重ねる位置を調整できます
+
+<table>
+<tr>
+<td>
 
 ```kotlin
 Box(
@@ -839,7 +927,12 @@ Box(
 }
 ```
 
-![image.png](attachment:4d44e65c-06e6-40e9-8d56-0e949702456f:image.png)
+</td>
+<td>
+
+</td>
+</tr>
+</table>
 
 ### **演習**
 
