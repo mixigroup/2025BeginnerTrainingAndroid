@@ -1931,138 +1931,142 @@ drawable には画像も追加できます。コードでアクセスした時�
 
 https://github.com/user-attachments/assets/defa3890-2422-4a2f-a227-902a3fe7fd89
 
-- 解説
+<details>
 
-  `RepoListItem`でブックマークアイコンを表示できるようにします。
+<summary>解説</summary>
 
-  ```kotlin
-  @Composable
-  fun RepoListItem(
-      item: Repo,
-      modifier: Modifier = Modifier,
-  ) {
-      Row(
-          modifier = modifier.padding(8.dp),
-          verticalAlignment = Alignment.CenterVertically,
-      ) {
-          Column(
-              modifier = Modifier.weight(1f),
-              verticalArrangement = Arrangement.spacedBy(4.dp),
-          ) {
-              Text(
-                  text = item.name,
-                  fontWeight = FontWeight.Bold,
-              )
-              item.description?.let { Text(text = it) }
-              Row {
-                  Icon(
-                      imageVector = Icons.Outlined.Star,
-                      tint = Color.LightGray,
-                      contentDescription = null,
-                  )
-                  Text(text = "${item.stars}")
-              }
-          }
+`RepoListItem`でブックマークアイコンを表示できるようにします。
 
-          IconButton(onClick = {}) {
-              Icon(
-                  painter = painterResource(R.drawable.bookmark),
-                  contentDescription = null,
-              )
-          }
-      }
-  }
+```kotlin
+@Composable
+fun RepoListItem(
+    item: Repo,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = item.name,
+                fontWeight = FontWeight.Bold,
+            )
+            item.description?.let { Text(text = it) }
+            Row {
+                Icon(
+                    imageVector = Icons.Outlined.Star,
+                    tint = Color.LightGray,
+                    contentDescription = null,
+                )
+                Text(text = "${item.stars}")
+            }
+        }
 
-  ```
+        IconButton(onClick = {}) {
+            Icon(
+                painter = painterResource(R.drawable.bookmark),
+                contentDescription = null,
+            )
+        }
+    }
+}
 
-  ブックマークアイコンがタップされたらアイコンを切り替えてブックマークされている状態がわかるようにしてみます。UI State を変更して、ブックマークされているリポジトリを`Set`で持たせるようにします。
+```
 
-  ```diff
-   data class HomeUiState(
-       val items: List<Repo>,
-  +    val bookmarkedItems: Set<Repo>,
-   )
-  ```
+ブックマークアイコンがタップされたらアイコンを切り替えてブックマークされている状態がわかるようにしてみます。UI State を変更して、ブックマークされているリポジトリを`Set`で持たせるようにします。
 
-  次にブックマークアイコンがタップされた時に発火させるコールバックを`HomeViewModel`に実装します。
+```diff
+ data class HomeUiState(
+     val items: List<Repo>,
++    val bookmarkedItems: Set<Repo>,
+ )
+```
 
-  ```kotlin
-  fun onClickBookmark(item: Repo) {
-      uiState.update {
-          val bookmarkedItems = if (item in uiState.value.bookmarkedItems) {
-              it.bookmarkedItems - item
-          } else {
-              it.bookmarkedItems + item
-          }
+次にブックマークアイコンがタップされた時に発火させるコールバックを`HomeViewModel`に実装します。
 
-          it.copy(bookmarkedItems = bookmarkedItems)
-      }
-  }
-  ```
+```kotlin
+fun onClickBookmark(item: Repo) {
+    uiState.update {
+        val bookmarkedItems = if (item in uiState.value.bookmarkedItems) {
+            it.bookmarkedItems - item
+        } else {
+            it.bookmarkedItems + item
+        }
 
-  `RepoListItem`でコールバックを受け取れるようにします。また、ブックマークされたかどうかの状態も受け取ってアイコンを切り替えるようにします。
+        it.copy(bookmarkedItems = bookmarkedItems)
+    }
+}
+```
 
-  ```diff
+`RepoListItem`でコールバックを受け取れるようにします。また、ブックマークされたかどうかの状態も受け取ってアイコンを切り替えるようにします。
+
+```diff
+ fun RepoListItem(
+     item: Repo,
+     isBookmarked: Boolean,
++    onClickBookmark: (Repo) -> Unit,
+     modifier: Modifier = Modifier,
+ ) {
+     Row(
+	     ...
+             }
+         }
+
+-        IconButton(onClick = {}) {
++        IconButton(onClick = { onClickBookmark(item) }) {
+             Icon(
+                 painter = painterResource(
+                     if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark
+```
+
+```diff
    fun RepoListItem(
-       item: Repo,
-       isBookmarked: Boolean,
-  +    onClickBookmark: (Repo) -> Unit,
-       modifier: Modifier = Modifier,
-   ) {
-       Row(
-  	     ...
-               }
-           }
+         IconButton(onClick = { onBookmarkIconClick(item) }) {
+             Icon(
+-                painter = painterResource(R.drawable.bookmark),
++                painter = painterResource(
++                    if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark
++                ),
+                 contentDescription = null,
+             )
+         }
+```
 
-  -        IconButton(onClick = {}) {
-  +        IconButton(onClick = { onClickBookmark(item) }) {
-               Icon(
-                   painter = painterResource(
-                       if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark
-  ```
+`HomeScreen`でクリックリスナーを受け取れるようにします。また、ブックマーク状態を反映するようにします。
 
-  ```diff
-     fun RepoListItem(
-           IconButton(onClick = { onBookmarkIconClick(item) }) {
-               Icon(
-  -                painter = painterResource(R.drawable.bookmark),
-  +                painter = painterResource(
-  +                    if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark
-  +                ),
-                   contentDescription = null,
-               )
-           }
-  ```
+```diff
+     HomeScreen(
+         modifier = modifier,
+         uiState = uiState,
++        onClickBookmark = viewModel::onClickBookmark,
+     )
+ }
 
-  `HomeScreen`でクリックリスナーを受け取れるようにします。また、ブックマーク状態を反映するようにします。
+ ...
 
-  ```diff
-       HomeScreen(
-           modifier = modifier,
-           uiState = uiState,
-  +        onClickBookmark = viewModel::onClickBookmark,
-       )
-   }
+  private fun HomeScreen(
+     uiState: HomeUiState,
++    onClickBookmark: (Repo) -> Unit,
+     modifier: Modifier = Modifier,
+ ) {
+     Scaffold(
 
-   ...
+ ...
+              ) { item ->
+                 RepoListItem(
+                     item = item,
++                    onClickBookmark = onClickBookmark,
++                    isBookmarked = item in uiState.bookmarkedItems,
+                 )
+             }
+         }
+```
 
-    private fun HomeScreen(
-       uiState: HomeUiState,
-  +    onClickBookmark: (Repo) -> Unit,
-       modifier: Modifier = Modifier,
-   ) {
-       Scaffold(
-
-   ...
-                ) { item ->
-                   RepoListItem(
-                       item = item,
-  +                    onClickBookmark = onClickBookmark,
-  +                    isBookmarked = item in uiState.bookmarkedItems,
-                   )
-               }
-           }
-  ```
+</details>
 
 ## Step 7 : データを端末内に永続化する
 
