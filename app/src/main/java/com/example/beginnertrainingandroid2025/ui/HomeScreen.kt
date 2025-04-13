@@ -9,17 +9,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.beginnertrainingandroid2025.data.Repo
-import com.example.beginnertrainingandroid2025.data.httpClient
 import com.example.beginnertrainingandroid2025.ui.theme.BeginnerTrainingAndroid2025Theme
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -30,18 +26,16 @@ data class HomeUiState(
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel(),
 ) {
-    val repos = remember { mutableStateListOf<Repo>() }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        withContext(Dispatchers.IO) {
-            val result: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-            repos.addAll(result)
-        }
+        viewModel.onLaunched()
     }
 
     HomeScreen(
-        repos = repos,
+        uiState = uiState,
         modifier = modifier,
     )
 }
@@ -49,7 +43,7 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
-    repos: List<Repo>,
+    uiState: HomeUiState,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -60,7 +54,7 @@ private fun HomeScreen(
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
             items(
-                items = repos,
+                items = uiState.items,
                 key = { it.id },
             ) {
                 RepoListItem(repo = it)
@@ -82,7 +76,7 @@ private fun HomeScreenPreview() {
             )
         }
         HomeScreen(
-            repos = repos,
+            uiState = HomeUiState(items = repos),
         )
     }
 }
