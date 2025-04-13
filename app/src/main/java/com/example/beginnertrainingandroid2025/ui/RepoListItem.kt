@@ -24,6 +24,8 @@ import com.example.beginnertrainingandroid2025.ui.theme.BeginnerTrainingAndroid2
 @Composable
 fun RepoListItem(
     repo: Repo,
+    isBookmarked: Boolean,
+    onBookmarkIconClick: (Repo) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -49,9 +51,9 @@ fun RepoListItem(
             }
         }
 
-        IconButton(onClick = {}) {
+        IconButton(onClick = { onBookmarkIconClick(repo) }) {
             Icon(
-                painter = painterResource(R.drawable.bookmark),
+                painter = painterResource(if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark),
                 contentDescription = null,
             )
         }
@@ -69,6 +71,8 @@ private fun RepoListItemPreview() {
                 description = "This is awesome repository.",
                 stars = 123,
             ),
+            isBookmarked = false,
+            onBookmarkIconClick = {},
         )
     }
 }

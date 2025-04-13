@@ -3,6 +3,7 @@ package com.example.beginnertrainingandroid2025.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.beginnertrainingandroid2025.data.Repo
 import com.example.beginnertrainingandroid2025.data.RepoRemoteDataSource
 import com.example.beginnertrainingandroid2025.data.RepoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +16,7 @@ class HomeViewModel(
     var uiState = MutableStateFlow(
         HomeUiState(
             items = emptyList(),
+            bookmarkedItems = emptySet(),
         )
     )
         private set
@@ -26,6 +28,18 @@ class HomeViewModel(
                     items = repository.getRepos(),
                 )
             }
+        }
+    }
+
+    fun onClickBookmark(item: Repo) {
+        uiState.update {
+            val bookmarkedItems = if (item in uiState.value.bookmarkedItems) {
+                it.bookmarkedItems - item
+            } else {
+                it.bookmarkedItems + item
+            }
+
+            it.copy(bookmarkedItems = bookmarkedItems)
         }
     }
 

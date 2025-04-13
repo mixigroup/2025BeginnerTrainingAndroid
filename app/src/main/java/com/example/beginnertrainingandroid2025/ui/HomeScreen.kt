@@ -37,6 +37,7 @@ fun HomeScreen(
 
     HomeScreen(
         uiState = uiState,
+        onBookmarkIconClick = viewModel::onClickBookmark,
         modifier = modifier,
     )
 }
@@ -45,6 +46,7 @@ fun HomeScreen(
 @Composable
 private fun HomeScreen(
     uiState: HomeUiState,
+    onBookmarkIconClick: (Repo) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -58,7 +60,11 @@ private fun HomeScreen(
                 items = uiState.items,
                 key = { it.id },
             ) {
-                RepoListItem(repo = it)
+                RepoListItem(
+                    repo = it,
+                    isBookmarked = it in uiState.bookmarkedItems,
+                    onBookmarkIconClick = onBookmarkIconClick,
+                )
             }
         }
     }
@@ -78,6 +84,7 @@ private fun HomeScreenPreview() {
         }
         HomeScreen(
             uiState = HomeUiState(items = repos, bookmarkedItems = emptySet()),
+            onBookmarkIconClick = {},
         )
     }
 }
