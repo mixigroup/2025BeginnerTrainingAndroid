@@ -981,109 +981,113 @@ data class Repo(
 
   - ものによっては大量に候補が出てきますが、大体は@Composable がついているものを選択すれば大丈夫なはずです
 
-  ![スクリーンショット 2025-04-07 16.35.44.png](attachment:e759dc1b-68c2-4f57-b52c-d76435c12077:スクリーンショット_2025-04-07_16.35.44.png)
+![スクリーンショット 2025-04-07 16.35.44.png](attachment:e759dc1b-68c2-4f57-b52c-d76435c12077:スクリーンショット_2025-04-07_16.35.44.png)
 
-- 解説
+<details>
 
-  概要は nullable なので、null チェックをしてからテキストを表示しましょう。if 文でのチェックでも良いですが、スコープ関数の`let`を使って Kotlin らしく書くことができます。テキストのフォントの太さは`FontWeight`で調整できます。
+<summary>解説</summary>
 
-  ```diff
-   fun RepoListItem(
-       repo: Repo,
-       modifier: Modifier = Modifier,
-  -)
-  +) {
-  +    Text(
-  +        text = repo.name,
-  +        fontWeight = FontWeight.Bold,
-  +    )
-  +    repo.description?.let { Text(text = it) }
-  +}
-  ```
+概要は nullable なので、null チェックをしてからテキストを表示しましょう。if 文でのチェックでも良いですが、スコープ関数の`let`を使って Kotlin らしく書くことができます。テキストのフォントの太さは`FontWeight`で調整できます。
 
-  プレビューで確認すると、テキストが重なって表示されてしまいます。`Column`を使って縦に並べましょう。
+```diff
+ fun RepoListItem(
+     repo: Repo,
+     modifier: Modifier = Modifier,
+-)
++) {
++    Text(
++        text = repo.name,
++        fontWeight = FontWeight.Bold,
++    )
++    repo.description?.let { Text(text = it) }
++}
+```
 
-  ```diff
-       repo: Repo,
-       modifier: Modifier = Modifier,
-   ) {
-  -    Text(
-  -        text = repo.name,
-  -        fontWeight = FontWeight.Bold,
-  -    )
-  -    repo.description?.let { Text(text = it) }
-  +    Column {
-  +        Text(
-  +            text = repo.name,
-  +            fontWeight = FontWeight.Bold,
-  +        )
-  +        repo.description?.let { Text(text = it) }
-  +    }
-   }
+プレビューで確認すると、テキストが重なって表示されてしまいます。`Column`を使って縦に並べましょう。
 
-  ```
+```diff
+     repo: Repo,
+     modifier: Modifier = Modifier,
+ ) {
+-    Text(
+-        text = repo.name,
+-        fontWeight = FontWeight.Bold,
+-    )
+-    repo.description?.let { Text(text = it) }
++    Column {
++        Text(
++            text = repo.name,
++            fontWeight = FontWeight.Bold,
++        )
++        repo.description?.let { Text(text = it) }
++    }
+ }
 
-  次にアイコンを表示してみましょう。Material Design の一部のアイコンが Icons で取得できるようになっています。アイコンの色を変えるには`tint`に`Color`を設定してください。 `contentDescription`にセットした文字列は、Talkback という Android のスクリーンリーダー機能で読み上げられます。
+```
 
-  詳しくは https://developer.android.com/develop/ui/compose/accessibility/key-steps を参照してください。
+次にアイコンを表示してみましょう。Material Design の一部のアイコンが Icons で取得できるようになっています。アイコンの色を変えるには`tint`に`Color`を設定してください。 `contentDescription`にセットした文字列は、Talkback という Android のスクリーンリーダー機能で読み上げられます。
 
-  ```diff
-       Column {
-           Text(
-                text = repo.name,
-                fontWeight = FontWeight.Bold,
-           )
-           repo.about?.let { Text(text = it) }
-  +        Icon(
-  +            imageVector = Icons.Outlined.Star,
-  +            tint = Color.LightGray,
-  +            contentDescription = null,
-  +        )
-       }
-   }
-  ```
+詳しくは https://developer.android.com/develop/ui/compose/accessibility/key-steps を参照してください。
 
-  スターアイコンの右隣にスター数を表示したいので、`Icon`と`Text`を`Row`で囲います。
+```diff
+     Column {
+         Text(
+              text = repo.name,
+              fontWeight = FontWeight.Bold,
+         )
+         repo.about?.let { Text(text = it) }
++        Icon(
++            imageVector = Icons.Outlined.Star,
++            tint = Color.LightGray,
++            contentDescription = null,
++        )
+     }
+ }
+```
 
-  ```diff
-       Column {
-           Text(
-                text = repo.name,
-                fontWeight = FontWeight.Bold,
-           )
-           repo.description?.let { Text(text = it) }
-  -        Icon(
-  -            imageVector = Icons.Outlined.Star,
-  -            tint = Color.LightGray,
-  -            contentDescription = null,
-  -        )
-  +        Row {
-  +            Icon(
-  +                imageVector = Icons.Outlined.Star,
-  +                tint = Color.LightGray,
-  +                contentDescription = null,
-  +            )
-  +            Text(text = "${repo.stars}")
-  +        }
-       }
-   }
-  ```
+スターアイコンの右隣にスター数を表示したいので、`Icon`と`Text`を`Row`で囲います。
 
-  最後に余白を`Modifier`で設定します。また、`Column`内の余白は`verticalArrangement`で入れます。`Column`や`Row`でのアイテム間の余白の入れ方は他にも各アイテムの`Modifier`で設定する方法と、`Spacer`という Composable 関数で設定する方法がありますが、私個人としては下記の方法が好みです。理由としては、コードがスッキリして見通しが良くなるのと、アイテムを削除するときに変に余白が設定されてしまうミスを防げるためです。
+```diff
+     Column {
+         Text(
+              text = repo.name,
+              fontWeight = FontWeight.Bold,
+         )
+         repo.description?.let { Text(text = it) }
+-        Icon(
+-            imageVector = Icons.Outlined.Star,
+-            tint = Color.LightGray,
+-            contentDescription = null,
+-        )
++        Row {
++            Icon(
++                imageVector = Icons.Outlined.Star,
++                tint = Color.LightGray,
++                contentDescription = null,
++            )
++            Text(text = "${repo.stars}")
++        }
+     }
+ }
+```
 
-  ```diff
-       repo: Repo,
-       modifier: Modifier = Modifier,
-   ) {
-  -    Column {
-  +    Column(
-  +        modifier = modifier.padding(8.dp),
-  +        verticalArrangement = Arrangement.spacedBy(4.dp),
-  +    ) {
-           Text(
-               text = repo.name,
-               fontWeight = FontWeight.Bold,
-  ```
+最後に余白を`Modifier`で設定します。また、`Column`内の余白は`verticalArrangement`で入れます。`Column`や`Row`でのアイテム間の余白の入れ方は他にも各アイテムの`Modifier`で設定する方法と、`Spacer`という Composable 関数で設定する方法がありますが、私個人としては下記の方法が好みです。理由としては、コードがスッキリして見通しが良くなるのと、アイテムを削除するときに変に余白が設定されてしまうミスを防げるためです。
+
+```diff
+     repo: Repo,
+     modifier: Modifier = Modifier,
+ ) {
+-    Column {
++    Column(
++        modifier = modifier.padding(8.dp),
++        verticalArrangement = Arrangement.spacedBy(4.dp),
++    ) {
+         Text(
+             text = repo.name,
+             fontWeight = FontWeight.Bold,
+```
+
+</details>
 
 ### テクニック
 
@@ -1123,7 +1127,7 @@ private fun RepoListItemPreview(
 
 次にリポジトリをリストで表示できるようにしてみましょう。
 
-![image](https://github.com/user-attachments/assets/bf4c9450-c69f-42bb-bcd0-f8e77fd826bc)
+<img width="300" alt="スクリーンショット 2025-04-14 4 22 11" src="https://github.com/user-attachments/assets/bf4c9450-c69f-42bb-bcd0-f8e77fd826bc" />
 
 リポジトリを一覧できる画面をホーム画面と呼ぶことにします。まずは、ホーム画面の UI を記述する Composable 関数を作成します。よく使われる命名としては`{画面名}Screen`です。今回は`HomeScreen`という命名で作成します。
 
