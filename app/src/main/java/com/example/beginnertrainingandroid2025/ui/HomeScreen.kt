@@ -21,6 +21,7 @@ import kotlin.random.nextInt
 
 data class HomeUiState(
     val items: List<Repo>,
+    val bookmarkedItems: Set<Repo>,
 )
 
 @Composable
@@ -76,7 +77,7 @@ private fun HomeScreenPreview() {
             )
         }
         HomeScreen(
-            uiState = HomeUiState(items = repos),
+            uiState = HomeUiState(items = repos, bookmarkedItems = emptySet()),
         )
     }
 }
