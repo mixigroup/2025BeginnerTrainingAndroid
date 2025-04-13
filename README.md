@@ -1761,104 +1761,108 @@ class MainViewModel(
 
 今まで作ったアプリにアーキテクチャを導入してみましょう
 
-- 解説
+<details>
 
-  最初に ViewModel を作成することにします。まずは UI State を宣言します。
+<summary>解説</summary>
 
-  ```kotlin
-  data class HomeUiState(
-      val items: List<Repo>,
-  )
-  ```
+最初に ViewModel を作成することにします。まずは UI State を宣言します。
 
-  ViewModel を作成します。一旦、HTTP クライアントを直接使うことを許容します。
+```kotlin
+data class HomeUiState(
+    val items: List<Repo>,
+)
+```
 
-  ```kotlin
-  class HomeViewModel: ViewModel() {
-      var uiState = MutableStateFlow(
-          HomeUiState(
-              items = emptyList(),
-          )
-      )
-          private set
+ViewModel を作成します。一旦、HTTP クライアントを直接使うことを許容します。
 
-      fun onLaunched() {
-          viewModelScope.launch {
-              val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-              uiState.update {
-                  it.copy(
-                      items = items,
-                  )
-              }
-          }
-      }
-  }
-  ```
+```kotlin
+class HomeViewModel: ViewModel() {
+    var uiState = MutableStateFlow(
+        HomeUiState(
+            items = emptyList(),
+        )
+    )
+        private set
 
-  Composable 関数にあるロジックを ViewModel で置き換えていきます。
+    fun onLaunched() {
+        viewModelScope.launch {
+            val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
+            uiState.update {
+                it.copy(
+                    items = items,
+                )
+            }
+        }
+    }
+}
+```
 
-  ```kotlin
-  @Composable
-  fun HomeScreen(
-      modifier: Modifier = Modifier,
-  ) {
-      val viewModel: HomeViewModel = koinViewModel()
-      val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+Composable 関数にあるロジックを ViewModel で置き換えていきます。
 
-      LaunchedEffect(Unit) {
-          viewModel.onLaunched()
-      }
+```kotlin
+@Composable
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+) {
+    val viewModel: HomeViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-      HomeScreen(
-          modifier = modifier,
-          uiState = uiState,
-      )
-  }
-  ```
+    LaunchedEffect(Unit) {
+        viewModel.onLaunched()
+    }
 
-  次にネットワーク通信をする処理を Repository と DataSource に分割します。
+    HomeScreen(
+        modifier = modifier,
+        uiState = uiState,
+    )
+}
+```
 
-  ```kotlin
-  class GithubRepoRemoteDataSource {
-      suspend fun fetchRepoList(): List<Repo> {
-          return httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-      }
-  }
-  ```
+次にネットワーク通信をする処理を Repository と DataSource に分割します。
 
-  ```kotlin
-  class GithubRepoRepository(
-      private val remoteDataSource: GithubRepoRemoteDataSource = GithubRepoRemoteDataSource(),
-  ) {
-      suspend fun getRepoList(): List<Repo> {
-          return remoteDataSource.fetchRepoList()
-      }
-  }
-  ```
+```kotlin
+class GithubRepoRemoteDataSource {
+    suspend fun fetchRepoList(): List<Repo> {
+        return httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
+    }
+}
+```
 
-  ViewModel で Repository を使います。
+```kotlin
+class GithubRepoRepository(
+    private val remoteDataSource: GithubRepoRemoteDataSource = GithubRepoRemoteDataSource(),
+) {
+    suspend fun getRepoList(): List<Repo> {
+        return remoteDataSource.fetchRepoList()
+    }
+}
+```
 
-  ```diff
-  -class HomeViewModel: ViewModel() {
-  +class HomeViewModel(
-  +    private val repository: GithubRepoRepository = GithubRepoRepository(),
-  +): ViewModel() {
-       var uiState = MutableStateFlow(
-           HomeUiState(
-               items = emptyList(),
+ViewModel で Repository を使います。
 
-       fun onLaunched() {
-           viewModelScope.launch {
-  -            val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-               uiState.update {
-                   it.copy(
-  -                    items = items,
-  +                    items = repository.getRepoList(),
-                   )
-               }
-           }
+```diff
+-class HomeViewModel: ViewModel() {
++class HomeViewModel(
++    private val repository: GithubRepoRepository = GithubRepoRepository(),
++): ViewModel() {
+     var uiState = MutableStateFlow(
+         HomeUiState(
+             items = emptyList(),
 
-  ```
+     fun onLaunched() {
+         viewModelScope.launch {
+-            val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
+             uiState.update {
+                 it.copy(
+-                    items = items,
++                    items = repository.getRepoList(),
+                 )
+             }
+         }
+
+```
+
+</details>
 
 ## Step 6 : ブックマーク機能を作る
 
