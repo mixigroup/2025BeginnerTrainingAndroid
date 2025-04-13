@@ -70,6 +70,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // view model
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
     // ktor
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
