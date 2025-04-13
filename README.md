@@ -1761,6 +1761,25 @@ class MainViewModel(
 
 今まで作ったアプリにアーキテクチャを導入してみましょう
 
+ViewModel ではファクトリを実装して、インスタンスの生成はファクトリに任せるようにします。ファクトリはライブラリで提供されているので以下のように実装します。
+
+```kotlin
+class HogeViewModel(private val repository: Repository): ViewModel() {
+
+    companion object {
+        // ViewModelProvider.Factoryを使ってファクトリを実装する
+		    val Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return HogeViewModel(
+                    repository = Repository(),
+                ) as T
+            }
+        }
+    }
+}
+```
+
 <details>
 
 <summary>解説</summary>
@@ -1861,6 +1880,42 @@ ViewModel で Repository を使います。
          }
 
 ```
+
+ファクトリを実装します。
+
+```kotlin
+class HomeViewModel(
+    private val repository: RepoRepository,
+): ViewModel() {
+    companion object {
+        val Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                HomeViewModel(
+                    repository = RepoRepository(
+                        remoteDataSource = RepoRemoteDataSource(),
+                    ),
+                ) as T
+        }
+    }
+}
+```
+
+実装したファクトリを渡して ViewModel を生成するようにします。
+
+```diff
+ @Composable
+ fun HomeScreen(
+     modifier: Modifier = Modifier,
+-    viewModel: HomeViewModel = viewModel(),
++    viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
+ ) {
+     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+```
+
+実装例として下記に実装しています。
+
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-4...reference/step-5
 
 </details>
 
