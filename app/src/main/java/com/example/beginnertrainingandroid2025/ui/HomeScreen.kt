@@ -23,6 +23,10 @@ import kotlinx.coroutines.withContext
 import kotlin.random.Random
 import kotlin.random.nextInt
 
+data class HomeUiState(
+    val items: List<Repo>,
+)
+
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
