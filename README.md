@@ -7,7 +7,7 @@
 # 開発環境
 
 - Kotlin 2.1.20
-- Android Studio Meerkat
+- Android Studio Meerkat Patch 1
 
 # はじめに
 
