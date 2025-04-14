@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class RepoRemoteDataSource {
-    suspend fun getRepos(): List<Repo> = withContext(Dispatchers.IO) {
+    suspend fun getRepoList(): List<Repo> = withContext(Dispatchers.IO) {
         httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
     }
 }
