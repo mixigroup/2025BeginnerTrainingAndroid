@@ -1970,11 +1970,10 @@ Button(onClick = { viewModel.onClick() })
 
 ブックマークのアイコンは、スターアイコンとは違ってライブラリにはありません。依存を追加すれば同じように取り込めますが、今回はアイコンをアプリに取り込むことにします。
 
-アイコンのデータ自体は https://fonts.google.com/icons から DL してください。
+アイコンのデータは プロジェクトルートの`asset`に置いてあります（ファイル形式は svg です）。
+※ アイコンのデータは https://fonts.google.com/icons を利用しています。
 
-次に Android Studio の Resource Manager を開いてください（赤矢印）。Resource Manager は、アプリ内で使用する画像やアイコンなどを管理する機能です。
-
-+アイコンをクリック（青矢印）して、Import Drawables でアイコンを取り込みましょう（橙矢印）。
+次に Android Studio の Resource Manager を開いてください（赤矢印）。Resource Manager は、アプリ内で使用する画像やアイコンなどを管理する機能です。 +アイコンをクリック（青矢印）して、Import Drawables でアイコンを取り込みましょう（橙矢印）。
 
 ![image](https://github.com/user-attachments/assets/95681e38-2749-45a4-be41-b67c4acef5c1)
 
