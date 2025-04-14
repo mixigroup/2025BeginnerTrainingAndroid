@@ -1660,9 +1660,13 @@ https://developer.android.com/topic/architecture
 
 ※ ドキュメントでは UI 層と Data 層の間に Domain 層が optional として存在しますが、今回は省略します。
 
+<img src="https://github.com/user-attachments/assets/46ba9eed-232a-4332-8d0b-98381e8cba8a" width="300">
+
 **UI 層**
 
 UI の表示処理を主に担うレイヤーです。UI 層はさらに以下のように分割することが推奨されています。
+
+<img src="https://github.com/user-attachments/assets/c2bb1bcc-e30e-47f7-9a0a-9d5522b34305" width="300">
 
 - **UI Elements**
   - 画面の UI を構成するコンポーネントです。例えば、ボタンやテキストなどです。
@@ -1724,6 +1728,8 @@ val viewModel: MaianViewModel = ViewModel()
 **Data 層**
 
 アプリデータの操作やビジネスロジックを含むレイヤーです。Data 層はさらに以下のように分割することが推奨されています。
+
+<img src="https://github.com/user-attachments/assets/622eb252-8a12-4ac0-9951-7af0b88e3d82" width="300">
 
 - Repository
   - データソース（≒ データの保存先）を隠蔽するレイヤーです
