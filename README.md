@@ -1768,7 +1768,7 @@ class HogeViewModel(private val repository: Repository): ViewModel() {
 
     companion object {
         // ViewModelProvider.Factoryを使ってファクトリを実装する
-		    val Factory = object : ViewModelProvider.Factory {
+        val Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return HogeViewModel(
