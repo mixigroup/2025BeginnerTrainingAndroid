@@ -1810,7 +1810,7 @@ class HomeViewModel: ViewModel() {
             val repos: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
             uiState.update {
                 it.copy(
-                  repos = repos,
+                    repos = repos,
                 )
             }
         }
