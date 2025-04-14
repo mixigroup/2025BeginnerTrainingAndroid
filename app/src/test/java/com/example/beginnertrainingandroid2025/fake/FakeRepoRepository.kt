@@ -1,4 +1,4 @@
-package com.example.beginnertrainingandroid2025
+package com.example.beginnertrainingandroid2025.fake
 
 import com.example.beginnertrainingandroid2025.data.Repo
 import com.example.beginnertrainingandroid2025.data.RepoRepository
