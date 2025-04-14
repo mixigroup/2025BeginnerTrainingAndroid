@@ -83,7 +83,7 @@ fun add(a: Int, b: Int, c: Int) = a + b + c
 fun add(a: Int, b: Int, c: Int) = a + b + c
 
 fun main() {
-		println(add(1, 2, 3))
+    println(add(1, 2, 3))
     println(add(a = 1, b = 2, c = 3)) // これでもOK
 }
 ```
