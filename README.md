@@ -2177,38 +2177,41 @@ Room を利用するには、以下の依存を追加する必要があります
 - `androidx.room:room-ktx`
 - `androidx.room:room-runtime`
 
-また、アノテーションを解析する必要があるのでパースするプラグイン（KSP）も追加します。
+また、ライブラリ側でアノテーション（`@Composable`などがアノテーション）をパースする必要があるので KSP（Kotlin Symbol Processing）というプラグインも追加します。
 
 - `com.google.devtools.ksp`
 
 **スキーマの定義**
 
 Room ではテーブルのスキーマを Kotlin のオブジェクトで表現できます。
+デフォルトではクラス名がテーブル名になりますが、`@Entity`アノテーションを使って変更できます。
 
 ```kotlin
 @Entity(
     tableName = "items",
 )
 data class ItemEntity(
-    @PrimaryKey val id: Int,
+    @PrimaryKey val id: Int, // プライマリキーを指定
     val isAdded: Boolean,
 )
 ```
 
 **DAO の定義**
 
-DAO は以下のように定義できます。
+DAO（Data Access Object） は以下のように定義できます。
+
+※ DAO : データベースにアクセスするためのオブジェクト
 
 ```kotlin
 @Dao
 interface ItemDao {
-    @Insert
+    @Insert // Insert文を発行するメソッドにできる
     suspend fun insert(item: ItemEntity)
 
     @Insert
     suspend fun insertAll(vararg item: ItemEntity)
 
-    @Query("SELECT * FROM repo")
+    @Query("SELECT * FROM repo") // 生のクエリをかける
     suspend fun findAll(): List<RepoEntity>
 
     @Delete
@@ -2218,24 +2221,27 @@ interface ItemDao {
 
 **データベースの作成**
 
+DAO インスタンスを生成するデータベースクラスを定義します。
+
 ```kotlin
 @Database(
     entities = [
-        RepoEntity::class,
-        BookmarkRepoEntity::class,
+        ItemEntity::class, // スキーマオブジェクトを渡す
     ],
     version = 1,
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun repoDao(): RepoDao
+    abstract fun itemDao(): ItemDao // DAO を返すメソッドを定義
 }
 ```
 
 **DAO のインスタンス化**
 
+実際に DAO インスタンスを生成するときは以下のようにします。
+
 ```kotlin
 val appDatabase = Room.databaseBuilder(
-                        app,
+                        app, // Application（後述）オブジェクトが必要
                         AppDatabase::class.java,
                         "app_database",
                   ).build()
