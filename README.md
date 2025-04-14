@@ -509,6 +509,9 @@ Wi-Fi で接続する場合は、青矢印の部分をクリックします。
 
 この章では、Github にある mixigroup のリポジトリを取得し、ブックマークできるアプリを作成します。
 
+https://github.com/user-attachments/assets/5f80fea3-961a-4b8c-a3a8-2cf5e368044e
+
+
 演習ではアプリを完成させるまでの道のりをステップに分けています。
 
 - [Step 0 : Jetpack Compose の基本について学習する](#step-0--jetpack-compose-の基本について学習する)
