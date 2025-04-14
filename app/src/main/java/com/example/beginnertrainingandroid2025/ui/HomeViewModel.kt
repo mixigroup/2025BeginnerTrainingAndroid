@@ -27,20 +27,23 @@ class HomeViewModel(
             uiState.update {
                 it.copy(
                     items = repository.getRepoList(),
+                    bookmarkedItems = repository.getBookmarkedRepoList().toSet(),
                 )
             }
         }
     }
 
     fun onClickBookmark(item: Repo) {
-        uiState.update {
-            val bookmarkedItems = if (item in uiState.value.bookmarkedItems) {
-                it.bookmarkedItems - item
-            } else {
-                it.bookmarkedItems + item
-            }
+        viewModelScope.launch {
+            uiState.update {
+                if (item in uiState.value.bookmarkedItems) {
+                    repository.saveAsUnBookmark(item)
+                } else {
+                    repository.saveAsBookmark(item)
+                }
 
-            it.copy(bookmarkedItems = bookmarkedItems)
+                it.copy(bookmarkedItems = repository.getBookmarkedRepoList().toSet())
+            }
         }
     }
 
