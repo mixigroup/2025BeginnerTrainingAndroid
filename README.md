@@ -2249,7 +2249,7 @@ val appDatabase = Room.databaseBuilder(
 val dao = appDatabase.repoDao()
 ```
 
-### Dependency Injection
+### ファクトリの実装
 
 DAO のインスタンスを注入するために、簡易的な Factory を実装します。
 
@@ -2257,13 +2257,16 @@ DAO のインスタンスを注入するために、簡易的な Factory を実�
 object LocalDataSourceFactory
 ```
 
-Application のインスタンスが必要なので Application クラスの onCreate で初期化することにします。
+DAO のインスタンスを作りには、Application オブジェクトが必要です。`Application`オブジェクトはカスタムで定義できる`MyApplication`クラスの`onCreate`で取得することにします。
+
+※ Application オブジェクト : アプリのパッケージ名など全体的な設定が含まれるオブジェクトです
+※ `MyApplication` : Application は一番最初にインスタンスが作られます。これを継承して自作の Application クラスを作成できます。初期化処理などが実装される場合が多いです。
 
 ```kotlin
 object LocalDataSourceFactory {
     private lateinit var appDatabase: AppDatabase
 
-    fun initialize(app: MyApplication) {
+    fun initialize(app: Application) {
         appDatabase =  Room.databaseBuilder(
             app,
             AppDatabase::class.java,
@@ -2283,14 +2286,7 @@ class MyApplication: Application() {
 }
 ```
 
-Repository では作成した Factory を使って LocalDataSource のインスタンスを受け取るようにします。
-
-```kotlin
-class GithubRepoRepository(
-    private val localDataSource: GithubRepoLocalDataSource = LocalDataSourceFactory.createGithubRepoLocalDataSource(),
-    private val remoteDataSource: GithubRepoRemoteDataSource = GithubRepoRemoteDataSource(),
-)
-```
+`MyAppllication` は `AndroidManifest.xml` に登録する必要があります。
 
 ### 演習
 
@@ -2630,8 +2626,6 @@ NavigationBar(modifier = modifier) {
       )
 }
 ```
-
-![スクリーンショット 2025-04-07 4.34.52.png](attachment:b52c50e7-b731-4f75-806f-9c242d0c68d9:スクリーンショット_2025-04-07_4.34.52.png)
 
 あとは同様にブックマーク画面に遷移するアイコンを表示します。
 
