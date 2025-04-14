@@ -707,11 +707,13 @@ Composable 関数で作成した UI の振る舞いや見た目を装飾する�
 
 ```kotlin
 @Composable
-fun ClickableText() {
+fun ClickableText(
+    modifier: Modifier = Modifier,
+) {
     var count by remember { mutableIntStateOf(0) }
 
     Text(
-        modifier = Modifier
+        modifier = modifier
             .clickable { count++ }
             .background(color = Color.Gray),
         text = "$count times clicked",
