@@ -1253,8 +1253,7 @@ GITHUB_API_KEY=<発行したトークン>
 ```
 
 `app`にある`build.gradle.kts`で`local.properties`ファイルを読み込み、`BuildConfig`で取得できるようにします。
-
-`BuildConfig`とはアプリのビルド時に生成されるオブジェクトです。
+※ `BuildConfig` : アプリのビルド時に生成されるオブジェクトです。
 
 ```kotlin
 android {
