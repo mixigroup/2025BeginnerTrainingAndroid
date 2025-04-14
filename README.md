@@ -7,7 +7,7 @@
 # 開発環境
 
 - Kotlin 2.1.20
-- Android Studio Meerkat
+- Android Studio Meerkat Patch 1
 
 # はじめに
 
@@ -983,7 +983,6 @@ data class Repo(
 
 ![image](https://github.com/user-attachments/assets/d7b0800b-6e98-4814-ae2b-b28dcff3036a)
 
-
 <details>
 
 <summary>解説</summary>
@@ -1088,6 +1087,9 @@ data class Repo(
              fontWeight = FontWeight.Bold,
 ```
 
+実装例として下記に実装しています。参考にしてみてください。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/main...reference/step-1
+
 </details>
 
 ### テクニック
@@ -1167,6 +1169,9 @@ LazyColumn(modifier = modifier) {
 
 Step 2 のコードを実装して、プレビューでリポジトリの一覧を表示できることを確認しましょう。
 
+実装例として下記に実装しています。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-1...reference/step-2
+
 ## Step 3: 画面のタイトルを表示する
 
 デバイスでリポジトリを表示してみると、OS のステータスバーと被って表示されてしまいました。一般的なアプリは画面の最上部にスペースを開けて、その画面の機能やメニューなどを表示できるようにテキストやアイコンを表示しているでしょう。Compose ではそのようなレイアウトが簡単に実装できるような API が公開されています。それが`Scaffold`です。
@@ -1223,6 +1228,9 @@ Scaffold(
 ### **演習**
 
 Step 3 のコードを実装して、デバイスにリポジトリの一覧を表示できることを確認しましょう。
+
+実装例として下記に実装しています。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-2...reference/step-3
 
 ## Step 4 : サーバーからリポジトリを取得する
 
@@ -1502,118 +1510,125 @@ JSON パーサー（kotlin serialization）は以下のプラグインを導入�
 
   ![image](https://github.com/user-attachments/assets/7537aacf-c28a-42a0-a66a-072d6d4d9a27)
 
-- 解説
+<details>
 
-  まず`Ktor`を導入します。
+<summary>解説</summary>
 
-  ```toml
-  # libs.versions.toml
-  [versions]
-  ktorClient = "3.1.0"
+まず`Ktor`を導入します。
 
-  [libraries]
-  ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClient" }
-  ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClient" }
-  ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClient" }
-  ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorClient" }
-  ```
+```toml
+# libs.versions.toml
+[versions]
+ktorClient = "3.1.0"
 
-  次に`app`配下にある`build.gradle.kts`に、toml ファイルに書いたライブラリを書きます。
+[libraries]
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClient" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClient" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClient" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorClient" }
+```
 
-  ```kotlin
-  // app/build.gradle.kts
-  dependencies {
-      ...
-      implementation(libs.ktor.client.core)
-      implementation(libs.ktor.client.cio)
-      implementation(libs.ktor.client.content.negotiation)
-      implementation(libs.ktor.serialization.kotlinx.json)
-      ...
-  ```
+次に`app`配下にある`build.gradle.kts`に、toml ファイルに書いたライブラリを書きます。
 
-  プラグインなので、さっきとは違い`[plugins]`の中に書きます。
-
-  ```toml
-  # libs.versions.toml
-  [plugins]
-  ...
-  kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-  ```
-
-  プロジェクトルートにある`build.gradle.kts`と`app`配下にある両方に plugin を追加します。
-
-  ```kotlin
-  // build.gradle.kts
-  plugins {
-      ...
-      alias(libs.plugins.kotlin.serialization) apply false
-  }
-
-  // app/build.gradle.kts
-  plugins {
-      ...
-      alias(libs.plugins.kotlin.serialization)
-  }
-
-  ```
-
-  `Repo`クラスを JSON レスポンスから変換できるようにします。JSON をパースしてオブジェクトに変換するには`@Serializable`をつければ OK です。ただし、JSON のキー名は一致させる必要があります。JSON キーがスネークケースなどプロパティ名を一致させるのが難しい場合は、`@SerialName`を使いましょう。
-
-  ```diff
-  +@Serializable
-   data class Repo(
-       val id: Int,
-       val name: String,
-       val description: String? = null,
-  -    val stars: Int,
-  +    @SerialName("stargazers_count") val stars: Int,
-   )
-  ```
-
-  プレビューではネットワーク通信ができません。なので`HomeScreen`を`MainActivity`で呼び出し、実機で表示できるようにしておきます。また、Android アプリは事前に「このアプリはインターネット通信をします」という宣言をしておかないと、通信できません。この状態でアプリを起動してもクラッシュします。なので、`AndroidManifest.xml`に以下を追記します。
-
-  ```xml
-  <uses-permission android:name="android.permission.INTERNET" />
-
-  <application
+```kotlin
+// app/build.gradle.kts
+dependencies {
     ...
-  ```
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    ...
+```
 
-  HTTP クライアントを使って`GET`してみます。
+プラグインなので、さっきとは違い`[plugins]`の中に書きます。
 
-  get メソッドは suspend 関数のため、呼び出すには Coroutine Scope が必要です。Composable 関数内で Coroutine を起動するには、`LaunchedEffect`を使います。（※ LaunchedEffect はネットワーク処理をするための Composable 関数ではありませんが、まずは通信できることを確認したいので許容します）
+```toml
+# libs.versions.toml
+[plugins]
+...
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+```
 
-  ```diff
-   ) {
-  +    LaunchedEffect(Unit) {
-  +        val result: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-  +    }
-  +
-       HomeScreen(
-           modifier = modifier,
-           items = emptyList(),
-  ```
+プロジェクトルートにある`build.gradle.kts`と`app`配下にある両方に plugin を追加します。
 
-  取得したリポジトリを表示できるようにしましょう。`List<Repo>`を監視して、取得に成功したら更新するようにします。監視するためには State オブジェクトにします。また、remember を使って Recomposition で関数が再実行されても値を記憶させます。
+```kotlin
+// build.gradle.kts
+plugins {
+    ...
+    alias(libs.plugins.kotlin.serialization) apply false
+}
 
-  ```diff
-   fun HomeScreen(
-       modifier: Modifier = Modifier,
-   ) {
-  +    var items = remember { mutableStateListOf<Repo>() }
-  +
-       LaunchedEffect(Unit) {
-           val result: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-  +        items.addAll(result)
-       }
+// app/build.gradle.kts
+plugins {
+    ...
+    alias(libs.plugins.kotlin.serialization)
+}
 
-       HomeScreen(
-           modifier = modifier,
-  -        items = emptyList(),
-  +        items = items,
-       )
-   }
-  ```
+```
+
+`Repo`クラスを JSON レスポンスから変換できるようにします。JSON をパースしてオブジェクトに変換するには`@Serializable`をつければ OK です。ただし、JSON のキー名は一致させる必要があります。JSON キーがスネークケースなどプロパティ名を一致させるのが難しい場合は、`@SerialName`を使いましょう。
+
+```diff
++@Serializable
+ data class Repo(
+     val id: Int,
+     val name: String,
+     val description: String? = null,
+-    val stars: Int,
++    @SerialName("stargazers_count") val stars: Int,
+ )
+```
+
+プレビューではネットワーク通信ができません。なので`HomeScreen`を`MainActivity`で呼び出し、実機で表示できるようにしておきます。また、Android アプリは事前に「このアプリはインターネット通信をします」という宣言をしておかないと、通信できません。この状態でアプリを起動してもクラッシュします。なので、`AndroidManifest.xml`に以下を追記します。
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+
+<application
+  ...
+```
+
+HTTP クライアントを使って`GET`してみます。
+
+get メソッドは suspend 関数のため、呼び出すには Coroutine Scope が必要です。Composable 関数内で Coroutine を起動するには、`LaunchedEffect`を使います。（※ LaunchedEffect はネットワーク処理をするための Composable 関数ではありませんが、まずは通信できることを確認したいので許容します）
+
+```diff
+ ) {
++    LaunchedEffect(Unit) {
++        val result: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
++    }
++
+     HomeScreen(
+         modifier = modifier,
+         items = emptyList(),
+```
+
+取得したリポジトリを表示できるようにしましょう。`List<Repo>`を監視して、取得に成功したら更新するようにします。監視するためには State オブジェクトにします。また、remember を使って Recomposition で関数が再実行されても値を記憶させます。
+
+```diff
+ fun HomeScreen(
+     modifier: Modifier = Modifier,
+ ) {
++    var items = remember { mutableStateListOf<Repo>() }
++
+     LaunchedEffect(Unit) {
+         val result: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
++        items.addAll(result)
+     }
+
+     HomeScreen(
+         modifier = modifier,
+-        items = emptyList(),
++        items = items,
+     )
+ }
+```
+
+実装例として下記に実装しています。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-3...reference/step-4
+
+</details>
 
 ## Step 5 : アプリアーキテクチャの導入
 
@@ -1647,7 +1662,6 @@ https://developer.android.com/topic/architecture
 flowchart TD;
 
 UI層 --> Data層
-
 ```
 
 **UI 層**
@@ -1747,104 +1761,163 @@ class MainViewModel(
 
 今まで作ったアプリにアーキテクチャを導入してみましょう
 
-- 解説
+ViewModel ではファクトリを実装して、インスタンスの生成はファクトリに任せるようにします。ファクトリはライブラリで提供されているので以下のように実装します。
 
-  最初に ViewModel を作成することにします。まずは UI State を宣言します。
+```kotlin
+class HogeViewModel(private val repository: Repository): ViewModel() {
 
-  ```kotlin
-  data class HomeUiState(
-      val items: List<Repo>,
-  )
-  ```
+    companion object {
+        // ViewModelProvider.Factoryを使ってファクトリを実装する
+		    val Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return HogeViewModel(
+                    repository = Repository(),
+                ) as T
+            }
+        }
+    }
+}
+```
 
-  ViewModel を作成します。一旦、HTTP クライアントを直接使うことを許容します。
+<details>
 
-  ```kotlin
-  class HomeViewModel: ViewModel() {
-      var uiState = MutableStateFlow(
-          HomeUiState(
-              items = emptyList(),
-          )
-      )
-          private set
+<summary>解説</summary>
 
-      fun onLaunched() {
-          viewModelScope.launch {
-              val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-              uiState.update {
-                  it.copy(
-                      items = items,
-                  )
-              }
-          }
-      }
-  }
-  ```
+最初に ViewModel を作成することにします。まずは UI State を宣言します。
 
-  Composable 関数にあるロジックを ViewModel で置き換えていきます。
+```kotlin
+data class HomeUiState(
+    val items: List<Repo>,
+)
+```
 
-  ```kotlin
-  @Composable
-  fun HomeScreen(
-      modifier: Modifier = Modifier,
-  ) {
-      val viewModel: HomeViewModel = koinViewModel()
-      val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+ViewModel を作成します。一旦、HTTP クライアントを直接使うことを許容します。
 
-      LaunchedEffect(Unit) {
-          viewModel.onLaunched()
-      }
+```kotlin
+class HomeViewModel: ViewModel() {
+    var uiState = MutableStateFlow(
+        HomeUiState(
+            items = emptyList(),
+        )
+    )
+        private set
 
-      HomeScreen(
-          modifier = modifier,
-          uiState = uiState,
-      )
-  }
-  ```
+    fun onLaunched() {
+        viewModelScope.launch {
+            val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
+            uiState.update {
+                it.copy(
+                    items = items,
+                )
+            }
+        }
+    }
+}
+```
 
-  次にネットワーク通信をする処理を Repository と DataSource に分割します。
+Composable 関数にあるロジックを ViewModel で置き換えていきます。
 
-  ```kotlin
-  class GithubRepoRemoteDataSource {
-      suspend fun fetchRepoList(): List<Repo> {
-          return httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-      }
-  }
-  ```
+```kotlin
+@Composable
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+) {
+    val viewModel: HomeViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-  ```kotlin
-  class GithubRepoRepository(
-      private val remoteDataSource: GithubRepoRemoteDataSource = GithubRepoRemoteDataSource(),
-  ) {
-      suspend fun getRepoList(): List<Repo> {
-          return remoteDataSource.fetchRepoList()
-      }
-  }
-  ```
+    LaunchedEffect(Unit) {
+        viewModel.onLaunched()
+    }
 
-  ViewModel で Repository を使います。
+    HomeScreen(
+        modifier = modifier,
+        uiState = uiState,
+    )
+}
+```
 
-  ```diff
-  -class HomeViewModel: ViewModel() {
-  +class HomeViewModel(
-  +    private val repository: GithubRepoRepository = GithubRepoRepository(),
-  +): ViewModel() {
-       var uiState = MutableStateFlow(
-           HomeUiState(
-               items = emptyList(),
+次にネットワーク通信をする処理を Repository と DataSource に分割します。
 
-       fun onLaunched() {
-           viewModelScope.launch {
-  -            val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-               uiState.update {
-                   it.copy(
-  -                    items = items,
-  +                    items = repository.getRepoList(),
-                   )
-               }
-           }
+```kotlin
+class GithubRepoRemoteDataSource {
+    suspend fun fetchRepoList(): List<Repo> {
+        return httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
+    }
+}
+```
 
-  ```
+```kotlin
+class GithubRepoRepository(
+    private val remoteDataSource: GithubRepoRemoteDataSource = GithubRepoRemoteDataSource(),
+) {
+    suspend fun getRepoList(): List<Repo> {
+        return remoteDataSource.fetchRepoList()
+    }
+}
+```
+
+ViewModel で Repository を使います。
+
+```diff
+-class HomeViewModel: ViewModel() {
++class HomeViewModel(
++    private val repository: GithubRepoRepository = GithubRepoRepository(),
++): ViewModel() {
+     var uiState = MutableStateFlow(
+         HomeUiState(
+             items = emptyList(),
+
+     fun onLaunched() {
+         viewModelScope.launch {
+-            val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
+             uiState.update {
+                 it.copy(
+-                    items = items,
++                    items = repository.getRepoList(),
+                 )
+             }
+         }
+
+```
+
+ファクトリを実装します。
+
+```kotlin
+class HomeViewModel(
+    private val repository: RepoRepository,
+): ViewModel() {
+    companion object {
+        val Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                HomeViewModel(
+                    repository = RepoRepository(
+                        remoteDataSource = RepoRemoteDataSource(),
+                    ),
+                ) as T
+        }
+    }
+}
+```
+
+実装したファクトリを渡して ViewModel を生成するようにします。
+
+```diff
+ @Composable
+ fun HomeScreen(
+     modifier: Modifier = Modifier,
+-    viewModel: HomeViewModel = viewModel(),
++    viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
+ ) {
+     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+```
+
+実装例として下記に実装しています。
+
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-4...reference/step-5
+
+</details>
 
 ## Step 6 : ブックマーク機能を作る
 
@@ -1913,138 +1986,146 @@ drawable には画像も追加できます。コードでアクセスした時�
 
 https://github.com/user-attachments/assets/defa3890-2422-4a2f-a227-902a3fe7fd89
 
-- 解説
+<details>
 
-  `RepoListItem`でブックマークアイコンを表示できるようにします。
+<summary>解説</summary>
 
-  ```kotlin
-  @Composable
-  fun RepoListItem(
-      item: Repo,
-      modifier: Modifier = Modifier,
-  ) {
-      Row(
-          modifier = modifier.padding(8.dp),
-          verticalAlignment = Alignment.CenterVertically,
-      ) {
-          Column(
-              modifier = Modifier.weight(1f),
-              verticalArrangement = Arrangement.spacedBy(4.dp),
-          ) {
-              Text(
-                  text = item.name,
-                  fontWeight = FontWeight.Bold,
-              )
-              item.description?.let { Text(text = it) }
-              Row {
-                  Icon(
-                      imageVector = Icons.Outlined.Star,
-                      tint = Color.LightGray,
-                      contentDescription = null,
-                  )
-                  Text(text = "${item.stars}")
-              }
-          }
+`RepoListItem`でブックマークアイコンを表示できるようにします。
 
-          IconButton(onClick = {}) {
-              Icon(
-                  painter = painterResource(R.drawable.bookmark),
-                  contentDescription = null,
-              )
-          }
-      }
-  }
+```kotlin
+@Composable
+fun RepoListItem(
+    item: Repo,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = item.name,
+                fontWeight = FontWeight.Bold,
+            )
+            item.description?.let { Text(text = it) }
+            Row {
+                Icon(
+                    imageVector = Icons.Outlined.Star,
+                    tint = Color.LightGray,
+                    contentDescription = null,
+                )
+                Text(text = "${item.stars}")
+            }
+        }
 
-  ```
+        IconButton(onClick = {}) {
+            Icon(
+                painter = painterResource(R.drawable.bookmark),
+                contentDescription = null,
+            )
+        }
+    }
+}
 
-  ブックマークアイコンがタップされたらアイコンを切り替えてブックマークされている状態がわかるようにしてみます。UI State を変更して、ブックマークされているリポジトリを`Set`で持たせるようにします。
+```
 
-  ```diff
-   data class HomeUiState(
-       val items: List<Repo>,
-  +    val bookmarkedItems: Set<Repo>,
-   )
-  ```
+ブックマークアイコンがタップされたらアイコンを切り替えてブックマークされている状態がわかるようにしてみます。UI State を変更して、ブックマークされているリポジトリを`Set`で持たせるようにします。
 
-  次にブックマークアイコンがタップされた時に発火させるコールバックを`HomeViewModel`に実装します。
+```diff
+ data class HomeUiState(
+     val items: List<Repo>,
++    val bookmarkedItems: Set<Repo>,
+ )
+```
 
-  ```kotlin
-  fun onClickBookmark(item: Repo) {
-      uiState.update {
-          val bookmarkedItems = if (item in uiState.value.bookmarkedItems) {
-              it.bookmarkedItems - item
-          } else {
-              it.bookmarkedItems + item
-          }
+次にブックマークアイコンがタップされた時に発火させるコールバックを`HomeViewModel`に実装します。
 
-          it.copy(bookmarkedItems = bookmarkedItems)
-      }
-  }
-  ```
+```kotlin
+fun onClickBookmark(item: Repo) {
+    uiState.update {
+        val bookmarkedItems = if (item in uiState.value.bookmarkedItems) {
+            it.bookmarkedItems - item
+        } else {
+            it.bookmarkedItems + item
+        }
 
-  `RepoListItem`でコールバックを受け取れるようにします。また、ブックマークされたかどうかの状態も受け取ってアイコンを切り替えるようにします。
+        it.copy(bookmarkedItems = bookmarkedItems)
+    }
+}
+```
 
-  ```diff
+`RepoListItem`でコールバックを受け取れるようにします。また、ブックマークされたかどうかの状態も受け取ってアイコンを切り替えるようにします。
+
+```diff
+ fun RepoListItem(
+     item: Repo,
+     isBookmarked: Boolean,
++    onClickBookmark: (Repo) -> Unit,
+     modifier: Modifier = Modifier,
+ ) {
+     Row(
+	     ...
+             }
+         }
+
+-        IconButton(onClick = {}) {
++        IconButton(onClick = { onClickBookmark(item) }) {
+             Icon(
+                 painter = painterResource(
+                     if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark
+```
+
+```diff
    fun RepoListItem(
-       item: Repo,
-       isBookmarked: Boolean,
-  +    onClickBookmark: (Repo) -> Unit,
-       modifier: Modifier = Modifier,
-   ) {
-       Row(
-  	     ...
-               }
-           }
+         IconButton(onClick = { onBookmarkIconClick(item) }) {
+             Icon(
+-                painter = painterResource(R.drawable.bookmark),
++                painter = painterResource(
++                    if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark
++                ),
+                 contentDescription = null,
+             )
+         }
+```
 
-  -        IconButton(onClick = {}) {
-  +        IconButton(onClick = { onClickBookmark(item) }) {
-               Icon(
-                   painter = painterResource(
-                       if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark
-  ```
+`HomeScreen`でクリックリスナーを受け取れるようにします。また、ブックマーク状態を反映するようにします。
 
-  ```diff
-     fun RepoListItem(
-           IconButton(onClick = { onBookmarkIconClick(item) }) {
-               Icon(
-  -                painter = painterResource(R.drawable.bookmark),
-  +                painter = painterResource(
-  +                    if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark
-  +                ),
-                   contentDescription = null,
-               )
-           }
-  ```
+```diff
+     HomeScreen(
+         modifier = modifier,
+         uiState = uiState,
++        onClickBookmark = viewModel::onClickBookmark,
+     )
+ }
 
-  `HomeScreen`でクリックリスナーを受け取れるようにします。また、ブックマーク状態を反映するようにします。
+ ...
 
-  ```diff
-       HomeScreen(
-           modifier = modifier,
-           uiState = uiState,
-  +        onClickBookmark = viewModel::onClickBookmark,
-       )
-   }
+  private fun HomeScreen(
+     uiState: HomeUiState,
++    onClickBookmark: (Repo) -> Unit,
+     modifier: Modifier = Modifier,
+ ) {
+     Scaffold(
 
-   ...
+ ...
+              ) { item ->
+                 RepoListItem(
+                     item = item,
++                    onClickBookmark = onClickBookmark,
++                    isBookmarked = item in uiState.bookmarkedItems,
+                 )
+             }
+         }
+```
 
-    private fun HomeScreen(
-       uiState: HomeUiState,
-  +    onClickBookmark: (Repo) -> Unit,
-       modifier: Modifier = Modifier,
-   ) {
-       Scaffold(
+実装例として下記に実装しています。
 
-   ...
-                ) { item ->
-                   RepoListItem(
-                       item = item,
-  +                    onClickBookmark = onClickBookmark,
-  +                    isBookmarked = item in uiState.bookmarkedItems,
-                   )
-               }
-           }
-  ```
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-5...reference/step-6
+
+</details>
 
 ## Step 7 : データを端末内に永続化する
 
@@ -2200,186 +2281,240 @@ bookmark_repos {
 repos ||--|| bookmark_repos : ""
 ```
 
-- 解説
+<details>
 
-  依存を追加します。
+<summary>解説</summary>
 
-  ```toml
-  [versions]
-  room = "2.6.1"
-  ksp = "2.0.21-1.0.27"
+依存を追加します。
 
-  [libraries]
-  androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-  androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
-  androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+```toml
+[versions]
+room = "2.6.1"
+ksp = "2.0.21-1.0.27"
 
-  [plugins]
-  ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-  ```
+[libraries]
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 
-  ```kotlin
+[plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+```
 
-  // build.gradle.kts
-  plugins {
-      alias(libs.plugins.ksp) apply false
-  }
+```kotlin
 
-  // app/build.gradle.kts
-  plugins {
-      alias(libs.plugins.ksp)
-  }
+// build.gradle.kts
+plugins {
+    alias(libs.plugins.ksp) apply false
+}
 
-  dependencies {
-      implementation(libs.androidx.room.runtime)
-      ksp(libs.androidx.room.compiler)
-      implementation(libs.androidx.room.ktx)
-  }
-  ```
+// app/build.gradle.kts
+plugins {
+    alias(libs.plugins.ksp)
+}
 
-  Room ではスキーマを Kotlin のオブジェクトで表現できます。
+dependencies {
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+}
+```
 
-  ```kotlin
-  @Entity(
-      tableName = "repo",
-  )
-  data class RepoEntity(
-      @PrimaryKey val id: Int,
-      val name: String,
-      val about: String? = null,
-      val stars: Int,
-  )
-  ```
+Room ではスキーマを Kotlin のオブジェクトで表現できます。
 
-  ```kotlin
-  @Entity(
-      tableName = "bookmark_repo",
-      primaryKeys = ["repo_id"],
-      foreignKeys = [
-          ForeignKey(
-              entity = RepoEntity::class,
-              parentColumns = ["id"],
-              childColumns = ["repo_id"],
-              onDelete = ForeignKey.CASCADE,
-          )
-      ]
-  )
-  data class BookmarkRepoEntity(
-      @ColumnInfo("repo_id") val repoId: Int,
-  )
-  ```
+```kotlin
+@Entity(
+    tableName = "repo",
+)
+data class RepoEntity(
+    @PrimaryKey val id: Int,
+    val name: String,
+    val about: String? = null,
+    val stars: Int,
+)
+```
 
-  データベースを定義します。さきほど定義したスキーマオブジェクトを渡します。
+```kotlin
+@Entity(
+    tableName = "bookmark_repo",
+    primaryKeys = ["repo_id"],
+    foreignKeys = [
+        ForeignKey(
+            entity = RepoEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["repo_id"],
+            onDelete = ForeignKey.CASCADE,
+        )
+    ]
+)
+data class BookmarkRepoEntity(
+    @ColumnInfo("repo_id") val repoId: Int,
+)
+```
 
-  ```kotlin
-  @Database(
-      entities = [
-          RepoEntity::class,
-          BookmarkRepoEntity::class,
-      ],
-      version = 1,
-  )
-  abstract class AppDatabase : RoomDatabase() {
-      abstract fun repoDao(): RepoDao
-  }
-  ```
+データベースを定義します。さきほど定義したスキーマオブジェクトを渡します。
 
-  DAO を実装します。
+```kotlin
+@Database(
+    entities = [
+        RepoEntity::class,
+        BookmarkRepoEntity::class,
+    ],
+    version = 1,
+)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun repoDao(): RepoDao
+}
+```
 
-  ```kotlin
-  @Dao
-  interface RepoDao {
-      @Query("SELECT * FROM repo")
-      suspend fun findAll(): List<RepoEntity>
+DAO を実装します。
 
-      @Insert
-      suspend fun insertAll(vararg repos: RepoEntity)
+```kotlin
+@Dao
+interface RepoDao {
+    @Query("SELECT * FROM repo")
+    suspend fun findAll(): List<RepoEntity>
 
-      @Insert
-      suspend fun insertBookmark(repo: BookmarkRepoEntity)
+    @Insert
+    suspend fun insertAll(vararg repos: RepoEntity)
 
-      @Delete
-      suspend fun deleteBookmark(repo: BookmarkRepoEntity)
+    @Insert
+    suspend fun insertBookmark(repo: BookmarkRepoEntity)
 
-      @Query("""
-          SELECT *
-          FROM repo
-          WHERE id IN bookmark_repo
-      """)
-      suspend fun findAllBookmark(): List<RepoEntity>
-  }
-  ```
+    @Delete
+    suspend fun deleteBookmark(repo: BookmarkRepoEntity)
 
-  これで DAO を使う準備ができました。それでは LocalDataSource を作成します。
+    @Query("""
+        SELECT *
+        FROM repo
+        WHERE id IN bookmark_repo
+    """)
+    suspend fun findAllBookmark(): List<RepoEntity>
+}
+```
 
-  ```kotlin
-  class GithubRepoLocalDataSource(
-      private val dao: RepoDao,
-  ) {
-      suspend fun saveRepoList(repoList: List<Repo>) {
-          dao.insertAll(*repoList.map { it.toEntity() }.toTypedArray())
-      }
+DB 用のリポジトリを表すオブジェクト（`RepoEntity`, `BookmarkRepoEntity`）と`Repo`を変換する処理を拡張関数で実装します。
 
-      suspend fun saveAsBookmark(repo: Repo) {
-          dao.insertBookmark(repo.toBookmarkEntity())
-      }
+```kotlin
+fun RepoEntity.toModel() = Repo(
+    id = id,
+    name = name,
+    description = description,
+    stars = stars,
+)
 
-      suspend fun saveAsUnBookmark(repo: Repo) {
-          dao.deleteBookmark(repo.toBookmarkEntity())
-      }
+fun Repo.toEntity() = RepoEntity(
+    id = id,
+    name = name,
+    description = description,
+    stars = stars,
+)
 
-      suspend fun getBookmarkRepoListFlow(): List<Repo> {
-          return dao.findAllBookmark().map { it.toModel() }
-      }
-  }
-  ```
+fun Repo.toBookmarkEntity() = BookmarkRepoEntity(
+    repoId = id,
+)
+```
 
-  Repository を修正します。
+`LocalDataSource`を作成します。
 
-  ```kotlin
-  class GithubRepoRepository(
-      private val localDataSource: GithubRepoLocalDataSource,
-      private val remoteDataSource: GithubRepoRemoteDataSource,
-  ) {
-      suspend fun getRepoList(): List<Repo> {
-          return localDataSource.getRepoList().ifEmpty {
-              val repoList = remoteDataSource.fetchRepoList().map { it.toModel() }
-              localDataSource.saveRepoList(repoList)
-              repoList
-          }
-      }
+```kotlin
+class GithubRepoLocalDataSource(
+    private val dao: RepoDao,
+) {
+    suspend fun getRepoList(): List<Repo> = dao.findAll().map { it.toModel() }
 
-      suspend fun saveAsBookmark(repo: Repo) {
-          localDataSource.saveAsBookmark(repo)
-      }
+    suspend fun saveRepoList(repoList: List<Repo>) {
+        dao.insertAll(*repoList.map { it.toEntity() }.toTypedArray())
+    }
 
-      suspend fun saveAsUnBookmark(repo: Repo) {
-          localDataSource.saveAsUnBookmark(repo)
-      }
+    suspend fun saveAsBookmark(repo: Repo) {
+        dao.insertBookmark(repo.toBookmarkEntity())
+    }
 
-      suspend fun getBookmarkedRepoList(): List<Repo> {
-          return localDataSource.getBookmarkRepoList()
-      }
-  }
-  ```
+    suspend fun saveAsUnBookmark(repo: Repo) {
+        dao.deleteBookmark(repo.toBookmarkEntity())
+    }
 
-  ViewModel を修正してブックマークしたリポジトリを永続化します。
+    suspend fun getBookmarkRepoListFlow(): List<Repo> {
+        return dao.findAllBookmark().map { it.toModel() }
+    }
+}
+```
 
-  ```kotlin
-      fun onBookmarkIconClick(item: Repo) {
-          viewModelScope.launch {
-              uiState.update {
-                  if (item in uiState.value.bookmarkedItems) {
-                      repository.saveAsUnBookmark(item)
-                  } else {
-                      repository.saveAsBookmark(item)
-                  }
+Repository を修正します。
 
-                  it.copy(bookmarkedItems = repository.getBookmarkedRepoListFlow().first().toSet())
-              }
-          }
-      }
-  ```
+```kotlin
+class RepoRepository(
+    private val localDataSource: RepoLocalDataSource,
+    private val remoteDataSource: RepoRemoteDataSource,
+) {
+    suspend fun getRepoList(): List<Repo> {
+        return localDataSource.getRepoList().ifEmpty {
+            val repoList = remoteDataSource.getRepoList()
+            localDataSource.saveRepoList(repoList)
+            repoList
+        }
+    }
+
+    suspend fun saveAsBookmark(repo: Repo) {
+        localDataSource.saveAsBookmark(repo)
+    }
+
+    suspend fun saveAsUnBookmark(repo: Repo) {
+        localDataSource.saveAsUnBookmark(repo)
+    }
+
+    suspend fun getBookmarkedRepoList(): List<Repo> {
+        return localDataSource.getBookmarkRepoList()
+    }
+}
+```
+
+`HomeViewModel`のファクトリで`RepoLocalDataSource`のインスタンスを渡すようにします。
+
+```diff
+   override fun <T : ViewModel> create(modelClass: Class<T>): T =
+       HomeViewModel(
+           repository = RepoRepository(
++              localDataSource = LocalDataSourceFactory.createRepoLocalDataSource(),
+               remoteDataSource = RepoRemoteDataSource(),
+           ),
+       ) as T
+```
+
+`HomeViewModel` を修正してブックマークしたリポジトリを永続化します。
+
+```kotlin
+fun onLaunched() {
+    viewModelScope.launch {
+        uiState.update {
+            it.copy(
+                items = repository.getRepoList(),
+                bookmarkedItems = repository.getBookmarkedRepoList().toSet(),
+            )
+        }
+    }
+}
+
+fun onBookmarkIconClick(item: Repo) {
+    viewModelScope.launch {
+        uiState.update {
+            if (item in uiState.value.bookmarkedItems) {
+                repository.saveAsUnBookmark(item)
+            } else {
+                repository.saveAsBookmark(item)
+            }
+
+            it.copy(bookmarkedItems = repository.getBookmarkedRepoList().toSet())
+        }
+    }
+}
+```
+
+実装例として下記に実装しています。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-6...reference/step-7
+
+</details>
 
 ## Step 8: ブックマーク画面への遷移処理を実装する
 
@@ -2666,13 +2801,13 @@ interface GithubRepoRepository {
 実際のコードで使う用の Repository とテスト用に使う Repository を用意します。
 
 ```diff
--class GithubRepoRepository(
-+class DefaultGithubRepoRepository(
-     private val localDataSource: GithubRepoLocalDataSource = LocalDataSourceFactory.createGithubRepoLocalDataSource(),
-     private val remoteDataSource: GithubRepoRemoteDataSource = GithubRepoRemoteDataSource(),
+-class RepoRepository(
++class DefaultRepoRepository(
+     private val localDataSource: RepoLocalDataSource = LocalDataSourceFactory.createRepoLocalDataSource(),
+     private val remoteDataSource: RepoRemoteDataSource = RepoRemoteDataSource(),
 -) {
 -    suspend fun getRepoList(): List<Repo> {
-+) : GithubRepoRepository {
++) : RepoRepository {
 +    override suspend fun getRepoList(): List<Repo> {
          return localDataSource.getRepoList().ifEmpty {
              val repoList = remoteDataSource.fetchRepoList()
@@ -2699,7 +2834,7 @@ interface GithubRepoRepository {
 テストで使う用の Repository です。初期値としてリポジトリを設定できるようにしているのと、実際の挙動に近づけるために delay を入れています。
 
 ```kotlin
-class FakeGithubRepoRepository(
+class FakeRepoRepository(
     private val repos: List<Repo>,
     bookmarkedRepos: List<Repo>,
 ) : GithubRepoRepository {
@@ -2733,128 +2868,153 @@ ViewModel では Repository の interface を受け取るようにして、テ�
 
 HomeViewModel の単体テストを書いてみましょう。
 
-- 解説
+<details>
 
-  テストファイルを作成しましょう。
+<summary>解説</summary>
 
-  ```kotlin
-  class HomeViewModelTest {}
-  ```
+テストファイルを作成しましょう。
 
-  `onLaunched`メソッドのテストを書いてみます。
+```kotlin
+class HomeViewModelTest {}
+```
 
-  ```kotlin
-  @Test
-  fun onLaunchedTest() {
-  		val repos = listOf(
-  		        Repo(
-  		            id = 1,
-  		            name = "fake repo1",
-  		            stars = 12,
-  		        ),
-  		        Repo(
-  		            id = 2,
-  		            description = "this is fake repository",
-  		            name = "fake repo2",
-  		            stars = 3,
-  		        ),
-  	  )
+`onLaunched`メソッドのテストを書いてみます。
 
-  	  val viewModel = HomeViewModel(
-  	        repository = FakeGithubRepoRepository(
-                repos = repos,
-                bookmarkedRepos = emptyList(),
-            ),
-  	  )
+```kotlin
+@Test
+fun onLaunchedTest() {
+		val repos = listOf(
+		        Repo(
+		            id = 1,
+		            name = "fake repo1",
+		            stars = 12,
+		        ),
+		        Repo(
+		            id = 2,
+		            description = "this is fake repository",
+		            name = "fake repo2",
+		            stars = 3,
+		        ),
+	  )
 
-  	  viewModel.onLaunched()
+	  val viewModel = HomeViewModel(
+	        repository = FakeGithubRepoRepository(
+              repos = repos,
+              bookmarkedRepos = emptyList(),
+          ),
+	  )
 
-  		assertEquals(
-  		    HomeUiState(
-  		        items = repos,
-  		        bookmarkedItems = emptySet(),
-  		    ),
-  		    viewModel.uiState.value,
-  		)
-  }
-  ```
+	  viewModel.onLaunched()
 
-  この時点でテストを実行しても実はエラーになります。エラー文を読むと Dispatchers.Main が見つからないようです。どこで Dispatchers.Main が使われているかというと、viewModelScope の中で使われています。
+		assertEquals(
+		    HomeUiState(
+		        items = repos,
+		        bookmarkedItems = emptySet(),
+		    ),
+		    viewModel.uiState.value,
+		)
+}
+```
 
-  > Exception in thread "Test worker" java.lang.IllegalStateException: Module with the Main dispatcher had failed to initialize. For tests Dispatchers.setMain from kotlinx-coroutines-test module can be used
+この時点でテストを実行しても実はエラーになります。エラー文を読むと Dispatchers.Main が見つからないようです。どこで Dispatchers.Main が使われているかというと、viewModelScope の中で使われています。
 
-  ではどうすれば良いかというと、テスト用に Dispatchers.Main を書き換えれば ok です。コルーチンのテストライブラリが必要なので、依存を追加します。
+> Exception in thread "Test worker" java.lang.IllegalStateException: Module with the Main dispatcher had failed to initialize. For tests Dispatchers.setMain from kotlinx-coroutines-test module can be used
 
-  ```toml
-  [versions]
-  kotlinxCoroutinesTest = "1.10.2"
+ではどうすれば良いかというと、テスト用に Dispatchers.Main を書き換えれば ok です。コルーチンのテストライブラリが必要なので、依存を追加します。
 
-  [libraries]
-  kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
-  ```
+```toml
+[versions]
+kotlinxCoroutinesTest = "1.10.2"
 
-  ```kotlin
-  testImplementation(libs.kotlinx.coroutines.test)
-  ```
+[libraries]
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+```
 
-  `Dispatchers.Main`を書き換えます。`@Before`をつけたメソッドはテスト毎に最初に呼ばれます。初期化処理などを書くのに便利です。`@After`はテスト毎に終了時に呼ばれます。リソースの解放などの処理を書くのに便利です。
+```kotlin
+testImplementation(libs.kotlinx.coroutines.test)
+```
 
-  ```kotlin
-  class HomeViewModelTest {
-      @Before
-      fun setUp() {
-          Dispatchers.setMain(StandardTestDispatcher())
-      }
+`Dispatchers.Main`を書き換えます。`@Before`をつけたメソッドはテスト毎に最初に呼ばれます。初期化処理などを書くのに便利です。`@After`はテスト毎に終了時に呼ばれます。リソースの解放などの処理を書くのに便利です。
 
-      @After
-      fun tearDown() {
-          Dispatchers.resetMain()
-      }
+```kotlin
+class HomeViewModelTest {
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(StandardTestDispatcher())
+    }
 
-  ...
-  ```
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 
-  とりあえずテストは実行できるようになりました。しかし、意図通りの値が入っておらずテストに失敗しています。原因はフェイクの Repository で`delay`で待っているからです。`delay`が終了するのを待たずにテストが実行されて`assert`で失敗しています。
+...
+```
 
-  > Expected :HomeUiState(items=[Repo(id=1, name=fake repo1, description=null, stars=12), Repo(id=2, name=fake repo2, description=this is fake repository, stars=3)], bookmarkedItems=[])
-  > Actual :HomeUiState(items=[], bookmarkedItems=[])
+とりあえずテストは実行できるようになりました。しかし、意図通りの値が入っておらずテストに失敗しています。原因はフェイクの Repository で`delay`で待っているからです。`delay`が終了するのを待たずにテストが実行されて`assert`で失敗しています。
 
-  どうすれば`delay`の完了を待てるのでしょうか？実は`delay`を良い感じにスキップしてくれるテスト用の API があります。`runTest`です。
+> Expected :HomeUiState(items=[Repo(id=1, name=fake repo1, description=null, stars=12), Repo(id=2, name=fake repo2, description=this is fake repository, stars=3)], bookmarkedItems=[])
+> Actual :HomeUiState(items=[], bookmarkedItems=[])
 
-  ```diff
-   @Test
-  -fun onLaunchedTest() {
-  +fun onLaunchedTest() = runTest {
-                  val repos = listOf(
-                          Repo(
-                              id = 1,
-  ```
+どうすれば`delay`の完了を待てるのでしょうか？実は`delay`を良い感じにスキップしてくれるテスト用の API があります。`runTest`です。
 
-  あとは`assert`の前に時間を進める API を呼んであげれば良いです。
+```diff
+ @Test
+-fun onLaunchedTest() {
++fun onLaunchedTest() = runTest {
+                val repos = listOf(
+                        Repo(
+                            id = 1,
+```
 
-  ```diff
-            )
+あとは`assert`の前に時間を進める API を呼んであげれば良いです。
 
-         viewModel.onLaunched()
-  +      advanceUntilIdle()
+```diff
+          )
 
-         assertEquals(
-            HomeUiState(
-                items = repos,
-                bookmarkedItems = emptySet(),
-            ),
-            viewModel.uiState.value,
-         )
-   }
-  ```
+       viewModel.onLaunched()
++      advanceUntilIdle()
 
-  これでテストが通るようになったと思います。`HomeViewModel#onClickBookmark`も同様にテストを書いてみてください。
+       assertEquals(
+          HomeUiState(
+              items = repos,
+              bookmarkedItems = emptySet(),
+          ),
+          viewModel.uiState.value,
+       )
+ }
+```
+
+これでテストが通るようになったと思います。
+
+実装例として下記に実装しています。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-8...reference/step-9
+
+</details>
 
 ## Step 10 : iOS アプリとコードを共有する
 
 ### Kotlin Multiplatform
 
-Kotlin では Kotlin Multiplatform（以下、KMP）という技術を使えば、iOS とコードを共有することができます。
+Kotlin Multiplatform（以下、KMP）という技術を使えば、iOS など他のプラットフォームとコードを共有することができます。
+
+共有できる部分は UI 以外のロジックの部分です。後述の Compose Multiplatform を使えば、UI 部分も共有することができます。
+
+KMP は Kotlin を開発している Jetbrains が開発しています。Google も KMP を公式にサポートすることを宣言していて、Google 公式のライブラリの KMP 対応などが進んでいます。
+
+Android と iOS はすでに安定版がリリースされていて、KMP を導入しているアプリが増えてきている印象があります。
+
+https://www.jetbrains.com/help/kotlin-multiplatform-dev/supported-platforms.html#current-platform-stability-levels-for-the-core-kotlin-multiplatform-technology
+
+### Compose Multiplatform
+
+Compose Multiplatform（CMP）を使えば、UI のコードも共有することができます。
+
+Android は安定版がリリースされていますが、iOS はまだベータ版です。
+
+https://www.jetbrains.com/help/kotlin-multiplatform-dev/supported-platforms.html#current-platform-stability-levels-for-compose-multiplatform-ui-framework
+
+### CMP で iOS でも動かせるようにする
 
 **環境構築**
 
@@ -2863,3 +3023,5 @@ KMP を導入するにはいくつか準備が必要です。まずは Xcode を
 次にシミュレータを用意してください。実機がある方は実機で ok です。
 
 次に KMP 用のプラグインを Android Studio にインストールします。
+
+{Github のリンク}で演習で作成したアプリを CMP 対応しました。時間があれば、iOS でも動作するか確認してみましょう。また、差分を眺めて普通の Android アプリとはどう違うかを調べてみましょう！
