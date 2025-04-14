@@ -5,14 +5,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.beginnertrainingandroid2025.data.Repo
 import com.example.beginnertrainingandroid2025.data.RepoRemoteDataSource
-import com.example.beginnertrainingandroid2025.data.RepoRepository
+import com.example.beginnertrainingandroid2025.data.DefaultRepoRepository
 import com.example.beginnertrainingandroid2025.di.LocalDataSourceFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val repository: RepoRepository,
+    private val repository: DefaultRepoRepository,
 ): ViewModel() {
     var uiState = MutableStateFlow(
         HomeUiState(
@@ -53,7 +53,7 @@ class HomeViewModel(
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T =
                     HomeViewModel(
-                        repository = RepoRepository(
+                        repository = DefaultRepoRepository(
                             localDataSource = LocalDataSourceFactory.createRepoLocalDataSource(),
                             remoteDataSource = RepoRemoteDataSource(),
                         ),

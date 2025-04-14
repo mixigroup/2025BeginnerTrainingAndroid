@@ -5,14 +5,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.beginnertrainingandroid2025.data.Repo
 import com.example.beginnertrainingandroid2025.data.RepoRemoteDataSource
-import com.example.beginnertrainingandroid2025.data.RepoRepository
+import com.example.beginnertrainingandroid2025.data.DefaultRepoRepository
 import com.example.beginnertrainingandroid2025.di.LocalDataSourceFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class BookmarkViewModel(
-    private val repository: RepoRepository,
+    private val repository: DefaultRepoRepository,
 ): ViewModel() {
     var uiState = MutableStateFlow(
         BookmarkScreenUiState(
@@ -46,7 +46,7 @@ class BookmarkViewModel(
                 modelClass: Class<T>,
             ): T {
                 return BookmarkViewModel(
-                    repository = RepoRepository(
+                    repository = DefaultRepoRepository(
                         localDataSource = LocalDataSourceFactory.createRepoLocalDataSource(),
                         remoteDataSource = RepoRemoteDataSource(),
                     ),
