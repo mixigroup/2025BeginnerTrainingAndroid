@@ -1670,11 +1670,13 @@ UI の表示処理を主に担うレイヤーです。UI 層はさらに以下�
   - 画面の UI を構成するコンポーネントです。例えば、ボタンやテキストなどです。
   - UI を表示する Composable 関数が当てはまります
 - **State Holder**
-  - 以下の責務を担うコンポーネントです
+  - 以下のような責務を担うコンポーネントです
     - UI の状態の保持
     - Data 層から取得したデータを UI の状態に変換
     - UI の状態を UI Elements に伝達
-  - 具体的にいえば、ViewModel がここに当てはまります
+    - UI からのイベント（タップ操作など）のハンドリング
+  - ViewModel や Presenter といったクラスが当てはまります
+    - [公式資料](https://developer.android.com/topic/architecture/recommendations)でも推奨されているため、研修では ViewModel を使います
 
 具体的には以下のような実装になるイメージです。
 
