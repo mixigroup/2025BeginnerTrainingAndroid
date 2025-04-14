@@ -2043,7 +2043,7 @@ fun RepoListItem(
 次にブックマークアイコンがタップされた時に発火させるコールバックを`HomeViewModel`に実装します。
 
 ```kotlin
-fun onClickBookmark(item: Repo) {
+fun onBookmarkIconClick(item: Repo) {
     uiState.update {
         val bookmarkedItems = if (item in uiState.value.bookmarkedItems) {
             it.bookmarkedItems - item
@@ -2062,7 +2062,7 @@ fun onClickBookmark(item: Repo) {
  fun RepoListItem(
      item: Repo,
      isBookmarked: Boolean,
-+    onClickBookmark: (Repo) -> Unit,
++    onBookmarkIconClick: (Repo) -> Unit,
      modifier: Modifier = Modifier,
  ) {
      Row(
@@ -2071,7 +2071,7 @@ fun onClickBookmark(item: Repo) {
          }
 
 -        IconButton(onClick = {}) {
-+        IconButton(onClick = { onClickBookmark(item) }) {
++        IconButton(onClick = { onBookmarkIconClick(item) }) {
              Icon(
                  painter = painterResource(
                      if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark
@@ -2096,7 +2096,7 @@ fun onClickBookmark(item: Repo) {
      HomeScreen(
          modifier = modifier,
          uiState = uiState,
-+        onClickBookmark = viewModel::onClickBookmark,
++        onBookmarkIconClick = viewModel::onBookmarkIconClick,
      )
  }
 
@@ -2104,7 +2104,7 @@ fun onClickBookmark(item: Repo) {
 
   private fun HomeScreen(
      uiState: HomeUiState,
-+    onClickBookmark: (Repo) -> Unit,
++    onBookmarkIconClick: (Repo) -> Unit,
      modifier: Modifier = Modifier,
  ) {
      Scaffold(
@@ -2113,7 +2113,7 @@ fun onClickBookmark(item: Repo) {
               ) { item ->
                  RepoListItem(
                      item = item,
-+                    onClickBookmark = onClickBookmark,
++                    onBookmarkIconClick = onBookmarkIconClick,
 +                    isBookmarked = item in uiState.bookmarkedItems,
                  )
              }
@@ -2742,7 +2742,7 @@ OK を押すとこんな感じでテストファイルが作成されます。
 ```kotlin
 class HomeViewModelTest {
     @Test
-    fun onClickBookmark() {
+    fun onBookmarkIconClick() {
     }
 }
 ```
