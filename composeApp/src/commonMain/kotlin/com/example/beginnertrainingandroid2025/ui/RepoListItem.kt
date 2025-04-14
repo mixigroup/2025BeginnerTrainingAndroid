@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -15,7 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import beginnertrainingandroid2025.composeapp.generated.resources.Res
+import beginnertrainingandroid2025.composeapp.generated.resources.bookmark
+import beginnertrainingandroid2025.composeapp.generated.resources.bookmark_filled
 import com.example.beginnertrainingandroid2025.data.Repo
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -48,12 +53,12 @@ fun RepoListItem(
             }
         }
 
-//        IconButton(onClick = { onBookmarkIconClick(repo) }) {
-//            Icon(
-//                painter = painterResource(if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark),
-//                contentDescription = null,
-//            )
-//        }
+        IconButton(onClick = { onBookmarkIconClick(repo) }) {
+            Icon(
+                painter = painterResource(if (isBookmarked) Res.drawable.bookmark_filled else Res.drawable.bookmark),
+                contentDescription = null,
+            )
+        }
     }
 }
 
