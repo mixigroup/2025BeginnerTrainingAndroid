@@ -2393,12 +2393,36 @@ interface RepoDao {
 }
 ```
 
-これで DAO を使う準備ができました。それでは LocalDataSource を作成します。
+DB 用のリポジトリを表すオブジェクト（`RepoEntity`, `BookmarkRepoEntity`）と`Repo`を変換する処理を拡張関数で実装します。
+
+```kotlin
+fun RepoEntity.toModel() = Repo(
+    id = id,
+    name = name,
+    description = description,
+    stars = stars,
+)
+
+fun Repo.toEntity() = RepoEntity(
+    id = id,
+    name = name,
+    description = description,
+    stars = stars,
+)
+
+fun Repo.toBookmarkEntity() = BookmarkRepoEntity(
+    repoId = id,
+)
+```
+
+`LocalDataSource`を作成します。
 
 ```kotlin
 class GithubRepoLocalDataSource(
     private val dao: RepoDao,
 ) {
+    suspend fun getRepoList(): List<Repo> = dao.findAll().map { it.toModel() }
+
     suspend fun saveRepoList(repoList: List<Repo>) {
         dao.insertAll(*repoList.map { it.toEntity() }.toTypedArray())
     }
@@ -2420,13 +2444,13 @@ class GithubRepoLocalDataSource(
 Repository を修正します。
 
 ```kotlin
-class GithubRepoRepository(
-    private val localDataSource: GithubRepoLocalDataSource,
-    private val remoteDataSource: GithubRepoRemoteDataSource,
+class RepoRepository(
+    private val localDataSource: RepoLocalDataSource,
+    private val remoteDataSource: RepoRemoteDataSource,
 ) {
     suspend fun getRepoList(): List<Repo> {
         return localDataSource.getRepoList().ifEmpty {
-            val repoList = remoteDataSource.fetchRepoList().map { it.toModel() }
+            val repoList = remoteDataSource.getRepoList()
             localDataSource.saveRepoList(repoList)
             repoList
         }
@@ -2446,23 +2470,49 @@ class GithubRepoRepository(
 }
 ```
 
-ViewModel を修正してブックマークしたリポジトリを永続化します。
+`HomeViewModel`のファクトリで`RepoLocalDataSource`のインスタンスを渡すようにします。
+
+```diff
+   override fun <T : ViewModel> create(modelClass: Class<T>): T =
+       HomeViewModel(
+           repository = RepoRepository(
++              localDataSource = LocalDataSourceFactory.createRepoLocalDataSource(),
+               remoteDataSource = RepoRemoteDataSource(),
+           ),
+       ) as T
+```
+
+`HomeViewModel` を修正してブックマークしたリポジトリを永続化します。
 
 ```kotlin
-    fun onBookmarkIconClick(item: Repo) {
-        viewModelScope.launch {
-            uiState.update {
-                if (item in uiState.value.bookmarkedItems) {
-                    repository.saveAsUnBookmark(item)
-                } else {
-                    repository.saveAsBookmark(item)
-                }
-
-                it.copy(bookmarkedItems = repository.getBookmarkedRepoListFlow().first().toSet())
-            }
+fun onLaunched() {
+    viewModelScope.launch {
+        uiState.update {
+            it.copy(
+                items = repository.getRepoList(),
+                bookmarkedItems = repository.getBookmarkedRepoList().toSet(),
+            )
         }
     }
+}
+
+fun onBookmarkIconClick(item: Repo) {
+    viewModelScope.launch {
+        uiState.update {
+            if (item in uiState.value.bookmarkedItems) {
+                repository.saveAsUnBookmark(item)
+            } else {
+                repository.saveAsBookmark(item)
+            }
+
+            it.copy(bookmarkedItems = repository.getBookmarkedRepoList().toSet())
+        }
+    }
+}
 ```
+
+実装例として下記に実装しています。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-6...reference/step-7
 
 </details>
 
