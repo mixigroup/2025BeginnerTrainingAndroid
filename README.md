@@ -2996,7 +2996,25 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-
 
 ### Kotlin Multiplatform
 
-Kotlin では Kotlin Multiplatform（以下、KMP）という技術を使えば、iOS とコードを共有することができます。
+Kotlin Multiplatform（以下、KMP）という技術を使えば、iOS など他のプラットフォームとコードを共有することができます。
+
+共有できる部分は UI 以外のロジックの部分です。後述の Compose Multiplatform を使えば、UI 部分も共有することができます。
+
+KMP は Kotlin を開発している Jetbrains が開発しています。Google も KMP を公式にサポートすることを宣言していて、Google 公式のライブラリの KMP 対応などが進んでいます。
+
+Android と iOS はすでに安定版がリリースされていて、KMP を導入しているアプリが増えてきている印象があります。
+
+https://www.jetbrains.com/help/kotlin-multiplatform-dev/supported-platforms.html#current-platform-stability-levels-for-the-core-kotlin-multiplatform-technology
+
+### Compose Multiplatform
+
+Compose Multiplatform（CMP）を使えば、UI のコードも共有することができます。
+
+Android は安定版がリリースされていますが、iOS はまだベータ版です。
+
+https://www.jetbrains.com/help/kotlin-multiplatform-dev/supported-platforms.html#current-platform-stability-levels-for-compose-multiplatform-ui-framework
+
+### CMP で iOS でも動かせるようにする
 
 **環境構築**
 
@@ -3005,3 +3023,5 @@ KMP を導入するにはいくつか準備が必要です。まずは Xcode を
 次にシミュレータを用意してください。実機がある方は実機で ok です。
 
 次に KMP 用のプラグインを Android Studio にインストールします。
+
+{Github のリンク}で演習で作成したアプリを CMP 対応しました。時間があれば、iOS でも動作するか確認してみましょう。また、差分を眺めて普通の Android アプリとはどう違うかを調べてみましょう！
