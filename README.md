@@ -15,7 +15,7 @@ Android とは、Google が開発している Linux ベースの携帯端末向�
 
 Android アプリとは、Android OS 上で動作するアプリケーションです。Android OS は Java VM のような仮想マシンを搭載しており、アプリはその仮想マシン上で実行されます。
 
-ユーザーは Google Play などのストアから Android アプリをインストールしてアプリを利用できます（もしくは、デバイスにプリインストールされています）。スマートフォンやタブレットはもちろん、TV（Android TV）、車載システム（Android Auto）やウェアラブル端末（Wear OS）など、幅広いデバイスで動作します。
+ユーザーは Google Play などのストアから Android アプリをインストールして利用できます（もしくは、デバイスにプリインストールされています）。スマートフォンやタブレットはもちろん、TV（Android TV）、車載システム（Android Auto）やウェアラブル端末（Wear OS）など、幅広いデバイスで動作します。
 
 Android アプリは、いまや様々なプログラミング言語で開発することができます。その中でも下記の理由から Kotlin が注目を浴びています。
 
@@ -29,11 +29,11 @@ Android アプリは、いまや様々なプログラミング言語で開発す
 
 # Kotlin について
 
-Kotlin は、JetBrains 社によって開発された静的型付けのプログラミング言語です。オープンソースとして[GitHub](https://github.com/JetBrains/kotlin)で公開されています。Java プログラムとの相互運用性を保ちながら、可読性を損なわず簡潔にプログラミングできるため、多くの開発者が好んで使っています。
+Kotlin は、JetBrains 社によって開発された静的型付けのプログラミング言語です。オープンソースとして[GitHub](https://github.com/JetBrains/kotlin)で公開されています。Java プログラムとの相互運用性を保ちながら、可読性が高く簡潔にプログラミングできるため、多くの開発者に利用されています。
 
 ## Kotlin の基礎知識
 
-ブラウザ上で Kotlin コードを実行できる Web サイトがあるので、実際にコードを動かしながら学習できしていきましょう。
+ブラウザ上で Kotlin コードを実行できる Web サイトがあるので、実際にコードを動かしながら学習していきましょう。
 
 https://play.kotlinlang.org/
 
@@ -83,7 +83,7 @@ fun add(a: Int, b: Int, c: Int) = a + b + c
 fun add(a: Int, b: Int, c: Int) = a + b + c
 
 fun main() {
-		println(add(1, 2, 3))
+    println(add(1, 2, 3))
     println(add(a = 1, b = 2, c = 3)) // これでもOK
 }
 ```
@@ -707,11 +707,13 @@ Composable 関数で作成した UI の振る舞いや見た目を装飾する�
 
 ```kotlin
 @Composable
-fun ClickableText() {
+fun ClickableText(
+    modifier: Modifier = Modifier,
+) {
     var count by remember { mutableIntStateOf(0) }
 
     Text(
-        modifier = Modifier
+        modifier = modifier
             .clickable { count++ }
             .background(color = Color.Gray),
         text = "$count times clicked",
@@ -1035,7 +1037,7 @@ data class Repo(
               text = repo.name,
               fontWeight = FontWeight.Bold,
          )
-         repo.about?.let { Text(text = it) }
+         repo.description?.let { Text(text = it) }
 +        Icon(
 +            imageVector = Icons.Outlined.Star,
 +            tint = Color.LightGray,
@@ -1071,7 +1073,7 @@ data class Repo(
  }
 ```
 
-最後に余白を`Modifier`で設定します。また、`Column`内の余白は`verticalArrangement`で入れます。`Column`や`Row`でのアイテム間の余白の入れ方は他にも各アイテムの`Modifier`で設定する方法と、`Spacer`という Composable 関数で設定する方法がありますが、私個人としては下記の方法が好みです。理由としては、コードがスッキリして見通しが良くなるのと、アイテムを削除するときに変に余白が設定されてしまうミスを防げるためです。
+最後に余白を`Modifier`で設定します。また、`Column`内の余白は`verticalArrangement`で入れます。`Column`や`Row`でのアイテム間の余白の入れ方は他にも各アイテムの`Modifier`で設定する方法と、`Spacer`という Composable 関数で設定する方法がありますが、私個人としては下記の方法が好みです。理由としては、コードがスッキリして見通しが良くなるのと、アイテムを削除するときに意図せず余白が残ってしまうのを防げるためです。
 
 ```diff
      repo: Repo,
@@ -1087,7 +1089,7 @@ data class Repo(
              fontWeight = FontWeight.Bold,
 ```
 
-実装例として下記に実装しています。参考にしてみてください。
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/main...reference/step-1
 
 </details>
@@ -1107,7 +1109,7 @@ class RepoPreviewParameterProvider: PreviewParameterProvider<Repo> {
         Repo(
             id = 2,
             name = "foo",
-            about = "This is awesome repository.",
+            description = "This is awesome repository.",
             stars = 1234,
         ),
     )
@@ -1139,12 +1141,12 @@ private fun RepoListItemPreview(
 ```kotlin
 @Composable
 fun HomeScreen(
-    items: List<Repo>,
+    repos: List<Repo>,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        items.forEach {
-            RepoListItem(item = it)
+        repos.forEach {
+            RepoListItem(repo = it)
         }
     }
 }
@@ -1157,10 +1159,10 @@ fun HomeScreen(
 ```kotlin
 LazyColumn(modifier = modifier) {
     items(
-        items = items,
+        items = repos,
         key = { it.id },
     ) {
-        RepoListItem(item = it)
+        RepoListItem(repo = it)
     }
 }
 ```
@@ -1169,7 +1171,7 @@ LazyColumn(modifier = modifier) {
 
 Step 2 のコードを実装して、プレビューでリポジトリの一覧を表示できることを確認しましょう。
 
-実装例として下記に実装しています。
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-1...reference/step-2
 
 ## Step 3: 画面のタイトルを表示する
@@ -1184,10 +1186,10 @@ Scaffold(
 ) {
     LazyColumn {
         items(
-            items = uiState.items,
+            items = uiState.repos,
             key = { it.id },
-        ) { item ->
-            RepoListItem(item = item)
+        ) { repo ->
+            RepoListItem(repo = repo)
         }
     }
 }
@@ -1221,7 +1223,7 @@ Scaffold(
 +             modifier = Modifier.padding(innerPadding),
 +         ) {
         items(
-            items = uiState.items,
+            items = uiState.repos,
             key = { it.id },
 ```
 
@@ -1229,7 +1231,7 @@ Scaffold(
 
 Step 3 のコードを実装して、デバイスにリポジトリの一覧を表示できることを確認しましょう。
 
-実装例として下記に実装しています。
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-2...reference/step-3
 
 ## Step 4 : サーバーからリポジトリを取得する
@@ -1253,8 +1255,7 @@ GITHUB_API_KEY=<発行したトークン>
 ```
 
 `app`にある`build.gradle.kts`で`local.properties`ファイルを読み込み、`BuildConfig`で取得できるようにします。
-
-`BuildConfig`とはアプリのビルド時に生成されるオブジェクトです。
+※ `BuildConfig` : アプリのビルド時に生成されるオブジェクトです。
 
 ```kotlin
 android {
@@ -1293,7 +1294,7 @@ https://github.com/user-attachments/assets/df368485-1a28-4cb5-b557-c3068d79b181
 
 ### Kotlin Coroutines による非同期処理
 
-Kotlin はコルーチンを使った非同期処理をサポートしています。コルーチンとは、中断・再開ができる軽量のスレッドのようなものです。コルーチンを使うと、普段と同じような書き味（同期的に）非同期処理を実装することができます。
+Kotlin はコルーチンを使った非同期処理をサポートしています。コルーチンとは、中断・再開ができる軽量のスレッドのようなものです。コルーチンを使うと、同期的な処理と同じような書き方で非同期処理を実装できます。
 
 ```kotlin
 scope.launch {
@@ -1443,7 +1444,7 @@ plugins {
 
 API からは JSON が返却されます。それをパースして Kotlin のオブジェクトに変換する必要があります。変換処理を丸ごと担ってくれるライブラリがプラグインとして Jetbrains から公開されているので、これを利用します。
 
-使い方は非常に簡単です。まずは、Json から変換したいクラスに`@Serializable`をつけます。JSON の命名とマッピング先のクラスで命名を変更したいときは、`@SerialName`で変更できます。
+使い方は非常に簡単です。まずは、JSON から変換したいクラスに`@Serializable`をつけます。JSON の命名とマッピング先のクラスで命名を変更したいときは、`@SerialName`で変更できます。
 
 ```kotlin
 @Serializable
@@ -1601,7 +1602,7 @@ get メソッドは suspend 関数のため、呼び出すには Coroutine Scope
 +
      HomeScreen(
          modifier = modifier,
-         items = emptyList(),
+         repos = emptyList(),
 ```
 
 取得したリポジトリを表示できるようにしましょう。`List<Repo>`を監視して、取得に成功したら更新するようにします。監視するためには State オブジェクトにします。また、remember を使って Recomposition で関数が再実行されても値を記憶させます。
@@ -1610,22 +1611,22 @@ get メソッドは suspend 関数のため、呼び出すには Coroutine Scope
  fun HomeScreen(
      modifier: Modifier = Modifier,
  ) {
-+    var items = remember { mutableStateListOf<Repo>() }
++    var repos = remember { mutableStateListOf<Repo>() }
 +
      LaunchedEffect(Unit) {
          val result: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-+        items.addAll(result)
++        repos.addAll(result)
      }
 
      HomeScreen(
          modifier = modifier,
--        items = emptyList(),
-+        items = items,
+-        repos = emptyList(),
++        repos = repos,
      )
  }
 ```
 
-実装例として下記に実装しています。
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-3...reference/step-4
 
 </details>
@@ -1636,24 +1637,23 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-
 
 ### アーキテクチャについて
 
-アーキテクチャについて考える上で特に重要なのが「関心の分離（Separation of Concerns）」です。これは、アプリケーションを構成するコンポーネントを役割ごとに分割することで、各コンポーネントの目的を明確にしコードに秩序を持たせるという原則です。
+アーキテクチャについて考える上で特に重要なのが「関心の分離（Separation of Concerns）」です。これは、アプリケーションを構成するコンポーネントを役割ごとに分割することで、各コンポーネントの目的を明確にしプログラムに秩序を持たせるという設計原則です。
 
-例えば、UI の表示と、データの取得や保存といった処理は、それぞれ異なる責務を持つものであり、同じクラスやファイルに混在させない方がコードの見通しが良くなるでしょう。こういった処理を適切に分割することで以下のメリットを得られます。
+例えば、UI の表示と、データの取得や保存といった処理は、それぞれ異なる責務を持つものであり、同じクラスやファイルに混在させない方がコードの見通しが良くなるでしょう。このように処理を適切に分割することで以下のメリットを得られます。
 
 - テストが書きやすくなる
   - UI 層とデータ層を分離することで、それぞれの層に特化した単体テストを書きやすくなります
   - これにより、個々のコンポーネントの振る舞いを独立して検証でき、テストの網羅性と信頼性が向上します。
 - 再利用性の向上
-  - 複数の機能で共通して利用される処理を切り出すことで、不要なコードを削除し再利用性を高めます
-  - これにより、開発効率が向上し保守コストを削減できます
+  - 複数の機能で共通して利用される処理を切り出すことで、同じ処理を何度も実装する必要がなくなります
+  - プログラムの再利用性を高めることで開発効率が向上できます
 - 保守性の向上
-  - 各層やコンポーネントが明確な役割を持ち、互いに疎結合になることで、修正や機能追加の影響範囲を局所化できます
-  - これにより、システム全体の安定性を維持しつつ、変更に強い柔軟な構造を実現できます。
+  - 各層やコンポーネント間の結合度を下げることで、修正や機能追加の影響範囲を狭めることができます
+  - これにより、変更に強い柔軟な構造を実現できます。
 
 ### Android アプリの推奨アーキテクチャ
 
-Android アプリの公式ドキュメントでは、以下のようなレイヤーがあるアーキテクチャを使うことが推奨されています。
-
+Android アプリの公式ドキュメントでは、以下のようなレイヤーがあるアーキテクチャが推奨されています。
 https://developer.android.com/topic/architecture
 
 ※ ドキュメントでは UI 層と Data 層の間に Domain 層が optional として存在しますが、今回は省略します。
@@ -1668,15 +1668,17 @@ UI層 --> Data層
 
 UI の表示処理を主に担うレイヤーです。UI 層はさらに以下のように分割することが推奨されています。
 
-- UI Elements
+- **UI Elements**
   - 画面の UI を構成するコンポーネントです。例えば、ボタンやテキストなどです。
-  - 具体的にいえば、Composable 関数がここに当てはまります
-- State Holder
-  - 以下の責務を担うコンポーネントです
+  - UI を表示する Composable 関数が当てはまります
+- **State Holder**
+  - 以下のような責務を担うコンポーネントです
     - UI の状態の保持
     - Data 層から取得したデータを UI の状態に変換
     - UI の状態を UI Elements に伝達
-  - 具体的にいえば、ViewModel がここに当てはまります
+    - UI からのイベント（タップ操作など）のハンドリング
+  - ViewModel や Presenter といったクラスが当てはまります
+    - [公式資料](https://developer.android.com/topic/architecture/recommendations)でも推奨されているため、研修では ViewModel を使います
 
 具体的には以下のような実装になるイメージです。
 
@@ -1768,7 +1770,7 @@ class HogeViewModel(private val repository: Repository): ViewModel() {
 
     companion object {
         // ViewModelProvider.Factoryを使ってファクトリを実装する
-		    val Factory = object : ViewModelProvider.Factory {
+        val Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return HogeViewModel(
@@ -1788,7 +1790,7 @@ class HogeViewModel(private val repository: Repository): ViewModel() {
 
 ```kotlin
 data class HomeUiState(
-    val items: List<Repo>,
+    val repos: List<Repo>,
 )
 ```
 
@@ -1798,17 +1800,17 @@ ViewModel を作成します。一旦、HTTP クライアントを直接使う�
 class HomeViewModel: ViewModel() {
     var uiState = MutableStateFlow(
         HomeUiState(
-            items = emptyList(),
+            repos = emptyList(),
         )
     )
         private set
 
     fun onLaunched() {
         viewModelScope.launch {
-            val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
+            val repos: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
             uiState.update {
                 it.copy(
-                    items = items,
+                    repos = repos,
                 )
             }
         }
@@ -1866,15 +1868,15 @@ ViewModel で Repository を使います。
 +): ViewModel() {
      var uiState = MutableStateFlow(
          HomeUiState(
-             items = emptyList(),
+             repos = emptyList(),
 
      fun onLaunched() {
          viewModelScope.launch {
--            val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
+-            val repos: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
              uiState.update {
                  it.copy(
--                    items = items,
-+                    items = repository.getRepoList(),
+-                    repos = repos,
++                    repos = repository.getRepoList(),
                  )
              }
          }
@@ -1913,62 +1915,67 @@ class HomeViewModel(
      val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 ```
 
-実装例として下記に実装しています。
-
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-4...reference/step-5
 
 </details>
 
 ## Step 6 : ブックマーク機能を作る
 
-次にブックマーク機能を作りましょう。まずは永続化は考えず、UI/UX 部分を作ることにします。
+次にブックマーク機能を作ります。まずは永続化は考えないことにします。
 
 ### イベントのハンドリング
 
-「ボタンをクリックした」などのユーザー操作によるイベントは、操作を受けた Composable 関数に流れてきます。このイベントを処理して再度状態を更新できるように、上位の Composable 関数からコールバックを渡すと良いです。
+「ボタンをクリックした」などのユーザー操作によるイベントは、その操作を受けた Composable 関数に流れてきます。
+
+<table>
+<tr>
+<td>
 
 ```kotlin
-ListItem(onClick = onClick)
-
-@Composable
-fun ListItem(onClick: () -> Unit) {
-    Button(onClick = onClick) {
-        Text("ボタン")
-    }
+// クリックされるたびにonClickが呼ばれる
+Button(onClick = onClick) {
+    Text("ボタン")
 }
 ```
 
-イベントを受け取ったあとは大体のケースで UI の状態を更新したいでしょう（ローディング用の UI を表示するなど）。コールバックの具体的な処理は、その状態を保持する状態ホルダーに実装した方が処理を集約できコードの見通しが良くなります。今回でいえば ViewModel です。
+</td>
+<td>
+
+# TODO: 動画を貼る
+
+</td>
+</tr>
+</table>
+
+アプリはユーザーの操作を起点に、API を叩くなど様々なロジックを実行します。そのような処理の実行責任は State Holder が担うべきです。
 
 ```kotlin
 class ViewModel() {
-    fun onListItemClick() {
-        // 何か重要な処理をする
+    // クリックできるComposable関数に渡すリスナー
+    fun onClick() {
         // 状態を更新する
         uiState.update { ... }
     }
 }
 ```
 
-コールバックは下記のように渡せます。
+リスナーは下記のように渡せます。
 
 ```kotlin
-ListItem(onClick = viewModel::onClick)
-```
-
-```kotlin
-ListItem(onClick = { viewModel.onClick() })
+// どっちでもリスナーを渡せる
+Button(onClick = viewModel::onClick)
+Button(onClick = { viewModel.onClick() })
 ```
 
 ### リソースを取り込む
 
 ブックマークのアイコンは、スターアイコンとは違ってライブラリにはありません。依存を追加すれば同じように取り込めますが、今回はアイコンをアプリに取り込むことにします。
 
-アイコンのデータ自体は https://fonts.google.com/icons から DL してください。
+アイコンのデータは プロジェクトルートの`asset`に置いてあります（ファイル形式は svg です）。
+※ アイコンのデータは https://fonts.google.com/icons を利用しています。
 
-次に Android Studio の Resource Manager を開いてください（赤矢印）。Resource Manager は、アプリ内で使用する画像やアイコンなどを管理する機能です。
-
-+アイコンをクリック（青矢印）して、Import Drawables でアイコンを取り込みましょう（橙矢印）。
+次に Android Studio の Resource Manager を開いてください（赤矢印）。Resource Manager は、アプリ内で使用する画像やアイコンなどを管理する機能です。 +アイコンをクリック（青矢印）して、Import Drawables でアイコンを取り込みましょう（橙矢印）。
 
 ![image](https://github.com/user-attachments/assets/95681e38-2749-45a4-be41-b67c4acef5c1)
 
@@ -1995,7 +2002,7 @@ https://github.com/user-attachments/assets/defa3890-2422-4a2f-a227-902a3fe7fd89
 ```kotlin
 @Composable
 fun RepoListItem(
-    item: Repo,
+    repo: Repo,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -2007,17 +2014,17 @@ fun RepoListItem(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
-                text = item.name,
+                text = repo.name,
                 fontWeight = FontWeight.Bold,
             )
-            item.description?.let { Text(text = it) }
+            repo.description?.let { Text(text = it) }
             Row {
                 Icon(
                     imageVector = Icons.Outlined.Star,
                     tint = Color.LightGray,
                     contentDescription = null,
                 )
-                Text(text = "${item.stars}")
+                Text(text = "${repo.stars}")
             }
         }
 
@@ -2036,23 +2043,23 @@ fun RepoListItem(
 
 ```diff
  data class HomeUiState(
-     val items: List<Repo>,
-+    val bookmarkedItems: Set<Repo>,
+     val repos: List<Repo>,
++    val bookmarkedRepos: Set<Repo>,
  )
 ```
 
 次にブックマークアイコンがタップされた時に発火させるコールバックを`HomeViewModel`に実装します。
 
 ```kotlin
-fun onClickBookmark(item: Repo) {
+fun onBookmarkIconClick(repo: Repo) {
     uiState.update {
-        val bookmarkedItems = if (item in uiState.value.bookmarkedItems) {
-            it.bookmarkedItems - item
+        val bookmarkedRepos = if (repo in uiState.value.bookmarkedRepos) {
+            it.bookmarkedRepos - repo
         } else {
-            it.bookmarkedItems + item
+            it.bookmarkedRepos + repo
         }
 
-        it.copy(bookmarkedItems = bookmarkedItems)
+        it.copy(bookmarkedRepos = bookmarkedRepos)
     }
 }
 ```
@@ -2061,9 +2068,9 @@ fun onClickBookmark(item: Repo) {
 
 ```diff
  fun RepoListItem(
-     item: Repo,
+     repo: Repo,
      isBookmarked: Boolean,
-+    onClickBookmark: (Repo) -> Unit,
++    onBookmarkIconClick: (Repo) -> Unit,
      modifier: Modifier = Modifier,
  ) {
      Row(
@@ -2072,7 +2079,7 @@ fun onClickBookmark(item: Repo) {
          }
 
 -        IconButton(onClick = {}) {
-+        IconButton(onClick = { onClickBookmark(item) }) {
++        IconButton(onClick = { onBookmarkIconClick(repo) }) {
              Icon(
                  painter = painterResource(
                      if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark
@@ -2080,7 +2087,7 @@ fun onClickBookmark(item: Repo) {
 
 ```diff
    fun RepoListItem(
-         IconButton(onClick = { onBookmarkIconClick(item) }) {
+         IconButton(onClick = { onBookmarkIconClick(repo) }) {
              Icon(
 -                painter = painterResource(R.drawable.bookmark),
 +                painter = painterResource(
@@ -2097,7 +2104,7 @@ fun onClickBookmark(item: Repo) {
      HomeScreen(
          modifier = modifier,
          uiState = uiState,
-+        onClickBookmark = viewModel::onClickBookmark,
++        onBookmarkIconClick = viewModel::onBookmarkIconClick,
      )
  }
 
@@ -2105,42 +2112,43 @@ fun onClickBookmark(item: Repo) {
 
   private fun HomeScreen(
      uiState: HomeUiState,
-+    onClickBookmark: (Repo) -> Unit,
++    onBookmarkIconClick: (Repo) -> Unit,
      modifier: Modifier = Modifier,
  ) {
      Scaffold(
 
  ...
-              ) { item ->
+              ) { repo ->
                  RepoListItem(
-                     item = item,
-+                    onClickBookmark = onClickBookmark,
-+                    isBookmarked = item in uiState.bookmarkedItems,
+                     repo = repo,
++                    onBookmarkIconClick = onBookmarkIconClick,
++                    isBookmarked = repo in uiState.bookmarkedRepos,
                  )
              }
          }
 ```
 
-実装例として下記に実装しています。
-
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-5...reference/step-6
 
 </details>
 
 ## Step 7 : データを端末内に永続化する
 
-今の状態ではアプリを終了した時にブックマークしたリポジトリの状態が失われてしまいます。次はブックマークした情報を端末に永続化して、アプリを終了しても情報を記憶できるようにしてみます。
+今の状態では、アプリを終了した時にブックマークしたリポジトリの情報が失われてしまいます。次はブックマークした情報を端末に永続化して記憶できるようにしましょう。
 
-データの永続化方法は大きく分けて 2 つあります。
+### 永続化の方法
 
-- ファイルへの保存
-  - Jetpack DataStore という公式ライブラリが用意されている
-- データベースへの保存
-  - Jetpack Room という公式ライブラリが用意されている
+データの永続化方法は大きく分けて 2 つありますが、今回はデータ量がそこそこ多いためデータベース（Jetpack Room）を使います。
 
-### Room について
+| 保存先       | ライブラリ名      | 使い分け                                                           |
+| ------------ | ----------------- | ------------------------------------------------------------------ |
+| ファイル     | Jetpack DataStore | 保存するデータが設定などのフラグやデータ量が少ない時に使う         |
+| データベース | Jetpack Room      | 保存するデータが大量で部分更新や参照生合性をサポートしたい時に使う |
 
-Room とは Google が開発している公式の DB ライブラリです。SQLite を抽象化しているので DAO のように扱えます。
+### Jetpack Room について
+
+Jetpack Room (以下、Room)とは Google が開発している公式の DB ライブラリです。SQLite を抽象化しています。
 
 **依存の追加**
 
@@ -2207,11 +2215,11 @@ abstract class AppDatabase : RoomDatabase() {
 **DAO のインスタンス化**
 
 ```kotlin
-val appDatabase =  Room.databaseBuilder(
-		    app,
-		    AppDatabase::class.java,
-		    "app_database",
-		).build()
+val appDatabase = Room.databaseBuilder(
+                        app,
+                        AppDatabase::class.java,
+                        "app_database",
+                  ).build()
 
 val dao = appDatabase.repoDao()
 ```
@@ -2267,18 +2275,18 @@ class GithubRepoRepository(
 
 ```mermaid
 erDiagram
-repos {
+repo {
   int id PK
   string name
-  string about
+  string description
   int stars
 }
 
-bookmark_repos {
+bookmark_repo {
   int repo_id PK, FK
 }
 
-repos ||--|| bookmark_repos : ""
+repo ||--|| bookmark_repo : ""
 ```
 
 <details>
@@ -2329,7 +2337,7 @@ Room ではスキーマを Kotlin のオブジェクトで表現できます。
 data class RepoEntity(
     @PrimaryKey val id: Int,
     val name: String,
-    val about: String? = null,
+    val description: String? = null,
     val stars: Int,
 )
 ```
@@ -2489,29 +2497,29 @@ fun onLaunched() {
     viewModelScope.launch {
         uiState.update {
             it.copy(
-                items = repository.getRepoList(),
-                bookmarkedItems = repository.getBookmarkedRepoList().toSet(),
+                repos = repository.getRepoList(),
+                bookmarkedRepos = repository.getBookmarkedRepoList().toSet(),
             )
         }
     }
 }
 
-fun onBookmarkIconClick(item: Repo) {
+fun onBookmarkIconClick(repo: Repo) {
     viewModelScope.launch {
         uiState.update {
-            if (item in uiState.value.bookmarkedItems) {
-                repository.saveAsUnBookmark(item)
+            if (repo in uiState.value.bookmarkedRepos) {
+                repository.saveAsUnBookmark(repo)
             } else {
-                repository.saveAsBookmark(item)
+                repository.saveAsBookmark(repo)
             }
 
-            it.copy(bookmarkedItems = repository.getBookmarkedRepoList().toSet())
+            it.copy(bookmarkedRepos = repository.getBookmarkedRepoList().toSet())
         }
     }
 }
 ```
 
-実装例として下記に実装しています。
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-6...reference/step-7
 
 </details>
@@ -2744,7 +2752,7 @@ OK を押すとこんな感じでテストファイルが作成されます。
 ```kotlin
 class HomeViewModelTest {
     @Test
-    fun onClickBookmark() {
+    fun onBookmarkIconClick() {
     }
 }
 ```
@@ -2908,8 +2916,8 @@ fun onLaunchedTest() {
 
 		assertEquals(
 		    HomeUiState(
-		        items = repos,
-		        bookmarkedItems = emptySet(),
+		        repos = repos,
+		        bookmarkedRepos = emptySet(),
 		    ),
 		    viewModel.uiState.value,
 		)
@@ -2953,8 +2961,8 @@ class HomeViewModelTest {
 
 とりあえずテストは実行できるようになりました。しかし、意図通りの値が入っておらずテストに失敗しています。原因はフェイクの Repository で`delay`で待っているからです。`delay`が終了するのを待たずにテストが実行されて`assert`で失敗しています。
 
-> Expected :HomeUiState(items=[Repo(id=1, name=fake repo1, description=null, stars=12), Repo(id=2, name=fake repo2, description=this is fake repository, stars=3)], bookmarkedItems=[])
-> Actual :HomeUiState(items=[], bookmarkedItems=[])
+> Expected :HomeUiState(repos=[Repo(id=1, name=fake repo1, description=null, stars=12), Repo(id=2, name=fake repo2, description=this is fake repository, stars=3)], bookmarkedRepos=[])
+> Actual :HomeUiState(repos=[], bookmarkedRepos=[])
 
 どうすれば`delay`の完了を待てるのでしょうか？実は`delay`を良い感じにスキップしてくれるテスト用の API があります。`runTest`です。
 
@@ -2977,8 +2985,8 @@ class HomeViewModelTest {
 
        assertEquals(
           HomeUiState(
-              items = repos,
-              bookmarkedItems = emptySet(),
+              repos = repos,
+              bookmarkedRepos = emptySet(),
           ),
           viewModel.uiState.value,
        )
@@ -2987,7 +2995,7 @@ class HomeViewModelTest {
 
 これでテストが通るようになったと思います。
 
-実装例として下記に実装しています。
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-8...reference/step-9
 
 </details>
