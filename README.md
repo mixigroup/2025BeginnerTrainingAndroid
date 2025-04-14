@@ -1920,7 +1920,7 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-
 
 ## Step 6 : ブックマーク機能を作る
 
-次にブックマーク機能を作りましょう。まずは永続化は考えず、UI/UX 部分を作ることにします。
+次にブックマーク機能を作ります。まずは永続化は考えないことにします。
 
 ### イベントのハンドリング
 
