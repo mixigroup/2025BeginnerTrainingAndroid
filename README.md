@@ -1651,8 +1651,7 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-
 
 ### Android アプリの推奨アーキテクチャ
 
-Android アプリの公式ドキュメントでは、以下のようなレイヤーがあるアーキテクチャを使うことが推奨されています。
-
+Android アプリの公式ドキュメントでは、以下のようなレイヤーがあるアーキテクチャが推奨されています。
 https://developer.android.com/topic/architecture
 
 ※ ドキュメントでは UI 層と Data 層の間に Domain 層が optional として存在しますが、今回は省略します。
