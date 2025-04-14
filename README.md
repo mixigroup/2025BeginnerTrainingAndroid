@@ -15,7 +15,7 @@ Android とは、Google が開発している Linux ベースの携帯端末向�
 
 Android アプリとは、Android OS 上で動作するアプリケーションです。Android OS は Java VM のような仮想マシンを搭載しており、アプリはその仮想マシン上で実行されます。
 
-ユーザーは Google Play などのストアから Android アプリをインストールしてアプリを利用できます（もしくは、デバイスにプリインストールされています）。スマートフォンやタブレットはもちろん、TV（Android TV）、車載システム（Android Auto）やウェアラブル端末（Wear OS）など、幅広いデバイスで動作します。
+ユーザーは Google Play などのストアから Android アプリをインストールして利用できます（もしくは、デバイスにプリインストールされています）。スマートフォンやタブレットはもちろん、TV（Android TV）、車載システム（Android Auto）やウェアラブル端末（Wear OS）など、幅広いデバイスで動作します。
 
 Android アプリは、いまや様々なプログラミング言語で開発することができます。その中でも下記の理由から Kotlin が注目を浴びています。
 
@@ -29,11 +29,11 @@ Android アプリは、いまや様々なプログラミング言語で開発す
 
 # Kotlin について
 
-Kotlin は、JetBrains 社によって開発された静的型付けのプログラミング言語です。オープンソースとして[GitHub](https://github.com/JetBrains/kotlin)で公開されています。Java プログラムとの相互運用性を保ちながら、可読性を損なわず簡潔にプログラミングできるため、多くの開発者が好んで使っています。
+Kotlin は、JetBrains 社によって開発された静的型付けのプログラミング言語です。オープンソースとして[GitHub](https://github.com/JetBrains/kotlin)で公開されています。Java プログラムとの相互運用性を保ちながら、可読性が高く簡潔にプログラミングできるため、多くの開発者に利用されています。
 
 ## Kotlin の基礎知識
 
-ブラウザ上で Kotlin コードを実行できる Web サイトがあるので、実際にコードを動かしながら学習できしていきましょう。
+ブラウザ上で Kotlin コードを実行できる Web サイトがあるので、実際にコードを動かしながら学習していきましょう。
 
 https://play.kotlinlang.org/
 
@@ -707,11 +707,13 @@ Composable 関数で作成した UI の振る舞いや見た目を装飾する�
 
 ```kotlin
 @Composable
-fun ClickableText() {
+fun ClickableText(
+    modifier: Modifier = Modifier,
+) {
     var count by remember { mutableIntStateOf(0) }
 
     Text(
-        modifier = Modifier
+        modifier = modifier
             .clickable { count++ }
             .background(color = Color.Gray),
         text = "$count times clicked",
@@ -1035,7 +1037,7 @@ data class Repo(
               text = repo.name,
               fontWeight = FontWeight.Bold,
          )
-         repo.about?.let { Text(text = it) }
+         repo.description?.let { Text(text = it) }
 +        Icon(
 +            imageVector = Icons.Outlined.Star,
 +            tint = Color.LightGray,
@@ -1071,7 +1073,7 @@ data class Repo(
  }
 ```
 
-最後に余白を`Modifier`で設定します。また、`Column`内の余白は`verticalArrangement`で入れます。`Column`や`Row`でのアイテム間の余白の入れ方は他にも各アイテムの`Modifier`で設定する方法と、`Spacer`という Composable 関数で設定する方法がありますが、私個人としては下記の方法が好みです。理由としては、コードがスッキリして見通しが良くなるのと、アイテムを削除するときに変に余白が設定されてしまうミスを防げるためです。
+最後に余白を`Modifier`で設定します。また、`Column`内の余白は`verticalArrangement`で入れます。`Column`や`Row`でのアイテム間の余白の入れ方は他にも各アイテムの`Modifier`で設定する方法と、`Spacer`という Composable 関数で設定する方法がありますが、私個人としては下記の方法が好みです。理由としては、コードがスッキリして見通しが良くなるのと、アイテムを削除するときに意図せず余白が残ってしまうのを防げるためです。
 
 ```diff
      repo: Repo,
@@ -1107,7 +1109,7 @@ class RepoPreviewParameterProvider: PreviewParameterProvider<Repo> {
         Repo(
             id = 2,
             name = "foo",
-            about = "This is awesome repository.",
+            description = "This is awesome repository.",
             stars = 1234,
         ),
     )
@@ -1139,12 +1141,12 @@ private fun RepoListItemPreview(
 ```kotlin
 @Composable
 fun HomeScreen(
-    items: List<Repo>,
+    repos: List<Repo>,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        items.forEach {
-            RepoListItem(item = it)
+        repos.forEach {
+            RepoListItem(repo = it)
         }
     }
 }
@@ -1157,10 +1159,10 @@ fun HomeScreen(
 ```kotlin
 LazyColumn(modifier = modifier) {
     items(
-        items = items,
+        items = repos,
         key = { it.id },
     ) {
-        RepoListItem(item = it)
+        RepoListItem(repo = it)
     }
 }
 ```
@@ -1184,10 +1186,10 @@ Scaffold(
 ) {
     LazyColumn {
         items(
-            items = uiState.items,
+            items = uiState.repos,
             key = { it.id },
-        ) { item ->
-            RepoListItem(item = item)
+        ) { repo ->
+            RepoListItem(repo = repo)
         }
     }
 }
@@ -1221,7 +1223,7 @@ Scaffold(
 +             modifier = Modifier.padding(innerPadding),
 +         ) {
         items(
-            items = uiState.items,
+            items = uiState.repos,
             key = { it.id },
 ```
 
@@ -1292,7 +1294,7 @@ https://github.com/user-attachments/assets/df368485-1a28-4cb5-b557-c3068d79b181
 
 ### Kotlin Coroutines による非同期処理
 
-Kotlin はコルーチンを使った非同期処理をサポートしています。コルーチンとは、中断・再開ができる軽量のスレッドのようなものです。コルーチンを使うと、普段と同じような書き味（同期的に）非同期処理を実装することができます。
+Kotlin はコルーチンを使った非同期処理をサポートしています。コルーチンとは、中断・再開ができる軽量のスレッドのようなものです。コルーチンを使うと、同期的な処理と同じような書き方で非同期処理を実装できます。
 
 ```kotlin
 scope.launch {
@@ -1442,7 +1444,7 @@ plugins {
 
 API からは JSON が返却されます。それをパースして Kotlin のオブジェクトに変換する必要があります。変換処理を丸ごと担ってくれるライブラリがプラグインとして Jetbrains から公開されているので、これを利用します。
 
-使い方は非常に簡単です。まずは、Json から変換したいクラスに`@Serializable`をつけます。JSON の命名とマッピング先のクラスで命名を変更したいときは、`@SerialName`で変更できます。
+使い方は非常に簡単です。まずは、JSON から変換したいクラスに`@Serializable`をつけます。JSON の命名とマッピング先のクラスで命名を変更したいときは、`@SerialName`で変更できます。
 
 ```kotlin
 @Serializable
@@ -1600,7 +1602,7 @@ get メソッドは suspend 関数のため、呼び出すには Coroutine Scope
 +
      HomeScreen(
          modifier = modifier,
-         items = emptyList(),
+         repos = emptyList(),
 ```
 
 取得したリポジトリを表示できるようにしましょう。`List<Repo>`を監視して、取得に成功したら更新するようにします。監視するためには State オブジェクトにします。また、remember を使って Recomposition で関数が再実行されても値を記憶させます。
@@ -1609,17 +1611,17 @@ get メソッドは suspend 関数のため、呼び出すには Coroutine Scope
  fun HomeScreen(
      modifier: Modifier = Modifier,
  ) {
-+    var items = remember { mutableStateListOf<Repo>() }
++    var repos = remember { mutableStateListOf<Repo>() }
 +
      LaunchedEffect(Unit) {
          val result: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-+        items.addAll(result)
++        repos.addAll(result)
      }
 
      HomeScreen(
          modifier = modifier,
--        items = emptyList(),
-+        items = items,
+-        repos = emptyList(),
++        repos = repos,
      )
  }
 ```
@@ -1788,7 +1790,7 @@ class HogeViewModel(private val repository: Repository): ViewModel() {
 
 ```kotlin
 data class HomeUiState(
-    val items: List<Repo>,
+    val repos: List<Repo>,
 )
 ```
 
@@ -1798,17 +1800,17 @@ ViewModel を作成します。一旦、HTTP クライアントを直接使う�
 class HomeViewModel: ViewModel() {
     var uiState = MutableStateFlow(
         HomeUiState(
-            items = emptyList(),
+            repos = emptyList(),
         )
     )
         private set
 
     fun onLaunched() {
         viewModelScope.launch {
-            val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
+            val repos: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
             uiState.update {
                 it.copy(
-                    items = items,
+                    repos = repos,
                 )
             }
         }
@@ -1866,15 +1868,15 @@ ViewModel で Repository を使います。
 +): ViewModel() {
      var uiState = MutableStateFlow(
          HomeUiState(
-             items = emptyList(),
+             repos = emptyList(),
 
      fun onLaunched() {
          viewModelScope.launch {
--            val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
+-            val repos: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
              uiState.update {
                  it.copy(
--                    items = items,
-+                    items = repository.getRepoList(),
+-                    repos = repos,
++                    repos = repository.getRepoList(),
                  )
              }
          }
@@ -2000,7 +2002,7 @@ https://github.com/user-attachments/assets/defa3890-2422-4a2f-a227-902a3fe7fd89
 ```kotlin
 @Composable
 fun RepoListItem(
-    item: Repo,
+    repo: Repo,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -2012,17 +2014,17 @@ fun RepoListItem(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
-                text = item.name,
+                text = repo.name,
                 fontWeight = FontWeight.Bold,
             )
-            item.description?.let { Text(text = it) }
+            repo.description?.let { Text(text = it) }
             Row {
                 Icon(
                     imageVector = Icons.Outlined.Star,
                     tint = Color.LightGray,
                     contentDescription = null,
                 )
-                Text(text = "${item.stars}")
+                Text(text = "${repo.stars}")
             }
         }
 
@@ -2041,23 +2043,23 @@ fun RepoListItem(
 
 ```diff
  data class HomeUiState(
-     val items: List<Repo>,
-+    val bookmarkedItems: Set<Repo>,
+     val repos: List<Repo>,
++    val bookmarkedRepos: Set<Repo>,
  )
 ```
 
 次にブックマークアイコンがタップされた時に発火させるコールバックを`HomeViewModel`に実装します。
 
 ```kotlin
-fun onClickBookmark(item: Repo) {
+fun onBookmarkIconClick(repo: Repo) {
     uiState.update {
-        val bookmarkedItems = if (item in uiState.value.bookmarkedItems) {
-            it.bookmarkedItems - item
+        val bookmarkedRepos = if (repo in uiState.value.bookmarkedRepos) {
+            it.bookmarkedRepos - repo
         } else {
-            it.bookmarkedItems + item
+            it.bookmarkedRepos + repo
         }
 
-        it.copy(bookmarkedItems = bookmarkedItems)
+        it.copy(bookmarkedRepos = bookmarkedRepos)
     }
 }
 ```
@@ -2066,9 +2068,9 @@ fun onClickBookmark(item: Repo) {
 
 ```diff
  fun RepoListItem(
-     item: Repo,
+     repo: Repo,
      isBookmarked: Boolean,
-+    onClickBookmark: (Repo) -> Unit,
++    onBookmarkIconClick: (Repo) -> Unit,
      modifier: Modifier = Modifier,
  ) {
      Row(
@@ -2077,7 +2079,7 @@ fun onClickBookmark(item: Repo) {
          }
 
 -        IconButton(onClick = {}) {
-+        IconButton(onClick = { onClickBookmark(item) }) {
++        IconButton(onClick = { onBookmarkIconClick(repo) }) {
              Icon(
                  painter = painterResource(
                      if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark
@@ -2085,7 +2087,7 @@ fun onClickBookmark(item: Repo) {
 
 ```diff
    fun RepoListItem(
-         IconButton(onClick = { onBookmarkIconClick(item) }) {
+         IconButton(onClick = { onBookmarkIconClick(repo) }) {
              Icon(
 -                painter = painterResource(R.drawable.bookmark),
 +                painter = painterResource(
@@ -2102,7 +2104,7 @@ fun onClickBookmark(item: Repo) {
      HomeScreen(
          modifier = modifier,
          uiState = uiState,
-+        onClickBookmark = viewModel::onClickBookmark,
++        onBookmarkIconClick = viewModel::onBookmarkIconClick,
      )
  }
 
@@ -2110,17 +2112,17 @@ fun onClickBookmark(item: Repo) {
 
   private fun HomeScreen(
      uiState: HomeUiState,
-+    onClickBookmark: (Repo) -> Unit,
++    onBookmarkIconClick: (Repo) -> Unit,
      modifier: Modifier = Modifier,
  ) {
      Scaffold(
 
  ...
-              ) { item ->
+              ) { repo ->
                  RepoListItem(
-                     item = item,
-+                    onClickBookmark = onClickBookmark,
-+                    isBookmarked = item in uiState.bookmarkedItems,
+                     repo = repo,
++                    onBookmarkIconClick = onBookmarkIconClick,
++                    isBookmarked = repo in uiState.bookmarkedRepos,
                  )
              }
          }
@@ -2273,18 +2275,18 @@ class GithubRepoRepository(
 
 ```mermaid
 erDiagram
-repos {
+repo {
   int id PK
   string name
-  string about
+  string description
   int stars
 }
 
-bookmark_repos {
+bookmark_repo {
   int repo_id PK, FK
 }
 
-repos ||--|| bookmark_repos : ""
+repo ||--|| bookmark_repo : ""
 ```
 
 <details>
@@ -2335,7 +2337,7 @@ Room ではスキーマを Kotlin のオブジェクトで表現できます。
 data class RepoEntity(
     @PrimaryKey val id: Int,
     val name: String,
-    val about: String? = null,
+    val description: String? = null,
     val stars: Int,
 )
 ```
@@ -2495,23 +2497,23 @@ fun onLaunched() {
     viewModelScope.launch {
         uiState.update {
             it.copy(
-                items = repository.getRepoList(),
-                bookmarkedItems = repository.getBookmarkedRepoList().toSet(),
+                repos = repository.getRepoList(),
+                bookmarkedRepos = repository.getBookmarkedRepoList().toSet(),
             )
         }
     }
 }
 
-fun onBookmarkIconClick(item: Repo) {
+fun onBookmarkIconClick(repo: Repo) {
     viewModelScope.launch {
         uiState.update {
-            if (item in uiState.value.bookmarkedItems) {
-                repository.saveAsUnBookmark(item)
+            if (repo in uiState.value.bookmarkedRepos) {
+                repository.saveAsUnBookmark(repo)
             } else {
-                repository.saveAsBookmark(item)
+                repository.saveAsBookmark(repo)
             }
 
-            it.copy(bookmarkedItems = repository.getBookmarkedRepoList().toSet())
+            it.copy(bookmarkedRepos = repository.getBookmarkedRepoList().toSet())
         }
     }
 }
@@ -2750,7 +2752,7 @@ OK を押すとこんな感じでテストファイルが作成されます。
 ```kotlin
 class HomeViewModelTest {
     @Test
-    fun onClickBookmark() {
+    fun onBookmarkIconClick() {
     }
 }
 ```
@@ -2914,8 +2916,8 @@ fun onLaunchedTest() {
 
 		assertEquals(
 		    HomeUiState(
-		        items = repos,
-		        bookmarkedItems = emptySet(),
+		        repos = repos,
+		        bookmarkedRepos = emptySet(),
 		    ),
 		    viewModel.uiState.value,
 		)
@@ -2959,8 +2961,8 @@ class HomeViewModelTest {
 
 とりあえずテストは実行できるようになりました。しかし、意図通りの値が入っておらずテストに失敗しています。原因はフェイクの Repository で`delay`で待っているからです。`delay`が終了するのを待たずにテストが実行されて`assert`で失敗しています。
 
-> Expected :HomeUiState(items=[Repo(id=1, name=fake repo1, description=null, stars=12), Repo(id=2, name=fake repo2, description=this is fake repository, stars=3)], bookmarkedItems=[])
-> Actual :HomeUiState(items=[], bookmarkedItems=[])
+> Expected :HomeUiState(repos=[Repo(id=1, name=fake repo1, description=null, stars=12), Repo(id=2, name=fake repo2, description=this is fake repository, stars=3)], bookmarkedRepos=[])
+> Actual :HomeUiState(repos=[], bookmarkedRepos=[])
 
 どうすれば`delay`の完了を待てるのでしょうか？実は`delay`を良い感じにスキップしてくれるテスト用の API があります。`runTest`です。
 
@@ -2983,8 +2985,8 @@ class HomeViewModelTest {
 
        assertEquals(
           HomeUiState(
-              items = repos,
-              bookmarkedItems = emptySet(),
+              repos = repos,
+              bookmarkedRepos = emptySet(),
           ),
           viewModel.uiState.value,
        )
