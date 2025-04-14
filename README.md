@@ -1660,12 +1660,6 @@ https://developer.android.com/topic/architecture
 
 ※ ドキュメントでは UI 層と Data 層の間に Domain 層が optional として存在しますが、今回は省略します。
 
-```mermaid
-flowchart TD;
-
-UI層 --> Data層
-```
-
 **UI 層**
 
 UI の表示処理を主に担うレイヤーです。UI 層はさらに以下のように分割することが推奨されています。
@@ -1684,13 +1678,17 @@ UI の表示処理を主に担うレイヤーです。UI 層はさらに以下�
 
 具体的には以下のような実装になるイメージです。
 
-ViewModel では UI の状態を UI State として公開します。UI State は一つのクラスに集約して定義します。
+まずは、UI の状態を定義します。
 
 ```kotlin
 data class MainUiState(
     val items: List<String>,
 )
+```
 
+State Holder である ViewModel では UI の状態を UI State として公開します。
+
+```kotlin
 class MainViewModel: ViewModel() {
     var uiState = MutableStateFlow(
         MainUiState(
@@ -1702,25 +1700,22 @@ class MainViewModel: ViewModel() {
 
 ```
 
-`Flow`はデータを連続的に送ることができるパイプのようなオブジェクトです。データを送りたい時は`update`か`setter`を呼び出します。
+`Flow`はデータを連続的に送ることができるパイプのようなオブジェクトです。データを送りたい時は`update`メソッドかセッターを呼び出します。
 
 ```kotlin
-uiState.update {
-    it.copy(items = items)
-}
-```
-
-```kotlin
+// どちらでもデータを送ることができる
+uiState.update { it.copy(items = items) }
 uiState.value = MainUiState(items = items)
 ```
 
-データを受け取りたい時は`Flow`を`collect`します。Composable 関数で受け取る場合は`collectAsStateWithLifecycle`を呼び出せば良いです。こうすれば UI State が ViewModel 側で更新されるたびに、Composable 関数に値が流れてきます。
+データを受け取るときは`Flow`を`collect`します。Composable 関数で受け取る場合は`collectAsStateWithLifecycle`を呼び出せば良いです。こうすれば UI State が ViewModel 側で更新されるたびに、Composable 関数に値が流れてきます。
 
 ```kotlin
 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 ```
 
 ViewModel の生成は下記のようにします。
+※ `androidx.lifecycle:lifecycle-viewmodel-compose` ライブラリの依存を追加する必要があります。
 
 ```kotlin
 val viewModel: MaianViewModel = ViewModel()
