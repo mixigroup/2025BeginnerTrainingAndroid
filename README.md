@@ -1924,39 +1924,46 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-
 
 ### イベントのハンドリング
 
-「ボタンをクリックした」などのユーザー操作によるイベントは、操作を受けた Composable 関数に流れてきます。このイベントを処理して再度状態を更新できるように、上位の Composable 関数からコールバックを渡すと良いです。
+「ボタンをクリックした」などのユーザー操作によるイベントは、その操作を受けた Composable 関数に流れてきます。
+
+<table>
+<tr>
+<td>
 
 ```kotlin
-ListItem(onClick = onClick)
-
-@Composable
-fun ListItem(onClick: () -> Unit) {
-    Button(onClick = onClick) {
-        Text("ボタン")
-    }
+// クリックされるたびにonClickが呼ばれる
+Button(onClick = onClick) {
+    Text("ボタン")
 }
 ```
 
-イベントを受け取ったあとは大体のケースで UI の状態を更新したいでしょう（ローディング用の UI を表示するなど）。コールバックの具体的な処理は、その状態を保持する状態ホルダーに実装した方が処理を集約できコードの見通しが良くなります。今回でいえば ViewModel です。
+</td>
+<td>
+
+# TODO: 動画を貼る
+
+</td>
+</tr>
+</table>
+
+アプリはユーザーの操作を起点に、API を叩くなど様々なロジックを実行します。そのような処理の実行責任は State Holder が担うべきです。
 
 ```kotlin
 class ViewModel() {
-    fun onListItemClick() {
-        // 何か重要な処理をする
+    // クリックできるComposable関数に渡すリスナー
+    fun onClick() {
         // 状態を更新する
         uiState.update { ... }
     }
 }
 ```
 
-コールバックは下記のように渡せます。
+リスナーは下記のように渡せます。
 
 ```kotlin
-ListItem(onClick = viewModel::onClick)
-```
-
-```kotlin
-ListItem(onClick = { viewModel.onClick() })
+// どっちでもリスナーを渡せる
+Button(onClick = viewModel::onClick)
+Button(onClick = { viewModel.onClick() })
 ```
 
 ### リソースを取り込む
