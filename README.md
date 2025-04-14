@@ -1723,37 +1723,53 @@ val viewModel: MaianViewModel = ViewModel()
 
 **Data 層**
 
-データの取得を担うレイヤーです。Data 層はさらに以下のように分割することが推奨されています。
+アプリデータの操作やビジネスロジックを含むレイヤーです。Data 層はさらに以下のように分割することが推奨されています。
 
 - Repository
-  - データを操作するレイヤーです
-  - ただし、データの保存先は隠蔽して利用側（今回でいえば State Holder）からはわからないようにします
+  - データソース（≒ データの保存先）を隠蔽するレイヤーです
+  - 関連するビジネスロジックも含む場合があります
 - RemoteDataSource
   - リモートにあるデータを操作するレイヤーです
-  - サーバーの API を叩く処理をここに実装します
+  - サーバーの API を叩く処理などはここに実装します
 - LocalDataSource
   - ローカルにあるデータを操作するレイヤーです
-  - 端末内にデータを保存する処理をここに実装します
+  - 端末内にデータを保存する処理などをここに実装します
 
 具体的には以下のような実装になるイメージです。
 
+単体テストしやすくするために、依存するクラスをコンストラクタで受け取るようにします。例えば、Repository では RemoteDataSource と LocalDataSource に依存するので、2 つ受け取っています。
+
 ```kotlin
 class Repository(
-    private val remoteDataSource = RemoteDataSource(),
-    private val localDataSource = LocalDataSource(),
-) {
-    suspend fun getItems(): List<String> {
-        // RemoteDataSourceとLocalDataSourceから値を取得する
-    }
-}
+    private val remoteDataSource: RemoteDataSource,
+    private val localDataSource: LocalDataSource,
+)
 ```
 
-ViewModel で利用できるようにします。
+データの操作には時間がかかります。Repository で公開する API は suspend 関数にして、コルーチン内で呼び出すことを強制させる方が良いでしょう。また、呼び出し元でスレッドを意識させないようにしてあげるとミスを防げます（この考え方をメインセーフと呼びます）。
 
 ```kotlin
-class MainViewModel(
-    private val repository = Repository(),
-): ViewModel()
+class Repository(
+    private val remoteDataSource: RemoteDataSource,
+    private val localDataSource: LocalDataSource,
+) {
+    // suspend 関数にして、呼び出し元でコルーチンを起動させる
+    suspend fun getRepoList(): List<Repo> {
+        return remoteDataSource.getRepoList()
+    }
+}
+
+class RemoteDataSource {
+    // withContextを使ってIO処理用のスレッドで実行させる
+    suspend fun getRepoList(): List<Repo> = withContext(Dispatchers.IO) {
+        return httpClient.get()
+    }
+}
+
+// ViewModelではスレッドを意識しなくて良い
+viewModelScope.launch {
+    val repoList = repository.getRepoList()
+}
 ```
 
 ### 演習
