@@ -1087,7 +1087,7 @@ data class Repo(
              fontWeight = FontWeight.Bold,
 ```
 
-実装例として下記に実装しています。参考にしてみてください。
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/main...reference/step-1
 
 </details>
@@ -1169,7 +1169,7 @@ LazyColumn(modifier = modifier) {
 
 Step 2 のコードを実装して、プレビューでリポジトリの一覧を表示できることを確認しましょう。
 
-実装例として下記に実装しています。
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-1...reference/step-2
 
 ## Step 3: 画面のタイトルを表示する
@@ -1229,7 +1229,7 @@ Scaffold(
 
 Step 3 のコードを実装して、デバイスにリポジトリの一覧を表示できることを確認しましょう。
 
-実装例として下記に実装しています。
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-2...reference/step-3
 
 ## Step 4 : サーバーからリポジトリを取得する
@@ -1625,7 +1625,7 @@ get メソッドは suspend 関数のため、呼び出すには Coroutine Scope
  }
 ```
 
-実装例として下記に実装しています。
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-3...reference/step-4
 
 </details>
@@ -1913,8 +1913,7 @@ class HomeViewModel(
      val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 ```
 
-実装例として下記に実装しています。
-
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-4...reference/step-5
 
 </details>
@@ -2121,8 +2120,7 @@ fun onClickBookmark(item: Repo) {
          }
 ```
 
-実装例として下記に実装しています。
-
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-5...reference/step-6
 
 </details>
@@ -2511,7 +2509,7 @@ fun onBookmarkIconClick(item: Repo) {
 }
 ```
 
-実装例として下記に実装しています。
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-6...reference/step-7
 
 </details>
@@ -2987,7 +2985,7 @@ class HomeViewModelTest {
 
 これでテストが通るようになったと思います。
 
-実装例として下記に実装しています。
+実装例の差分は以下を参考にしてみてください。
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-8...reference/step-9
 
 </details>
