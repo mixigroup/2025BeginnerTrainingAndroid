@@ -1035,7 +1035,7 @@ data class Repo(
               text = repo.name,
               fontWeight = FontWeight.Bold,
          )
-         repo.about?.let { Text(text = it) }
+         repo.description?.let { Text(text = it) }
 +        Icon(
 +            imageVector = Icons.Outlined.Star,
 +            tint = Color.LightGray,
@@ -1107,7 +1107,7 @@ class RepoPreviewParameterProvider: PreviewParameterProvider<Repo> {
         Repo(
             id = 2,
             name = "foo",
-            about = "This is awesome repository.",
+            description = "This is awesome repository.",
             stars = 1234,
         ),
     )
@@ -2268,7 +2268,7 @@ erDiagram
 repos {
   int id PK
   string name
-  string about
+  string description
   int stars
 }
 
@@ -2327,7 +2327,7 @@ Room ではスキーマを Kotlin のオブジェクトで表現できます。
 data class RepoEntity(
     @PrimaryKey val id: Int,
     val name: String,
-    val about: String? = null,
+    val description: String? = null,
     val stars: Int,
 )
 ```
