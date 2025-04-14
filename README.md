@@ -2801,13 +2801,13 @@ interface GithubRepoRepository {
 実際のコードで使う用の Repository とテスト用に使う Repository を用意します。
 
 ```diff
--class GithubRepoRepository(
-+class DefaultGithubRepoRepository(
-     private val localDataSource: GithubRepoLocalDataSource = LocalDataSourceFactory.createGithubRepoLocalDataSource(),
-     private val remoteDataSource: GithubRepoRemoteDataSource = GithubRepoRemoteDataSource(),
+-class RepoRepository(
++class DefaultRepoRepository(
+     private val localDataSource: RepoLocalDataSource = LocalDataSourceFactory.createRepoLocalDataSource(),
+     private val remoteDataSource: RepoRemoteDataSource = RepoRemoteDataSource(),
 -) {
 -    suspend fun getRepoList(): List<Repo> {
-+) : GithubRepoRepository {
++) : RepoRepository {
 +    override suspend fun getRepoList(): List<Repo> {
          return localDataSource.getRepoList().ifEmpty {
              val repoList = remoteDataSource.fetchRepoList()
@@ -2834,7 +2834,7 @@ interface GithubRepoRepository {
 テストで使う用の Repository です。初期値としてリポジトリを設定できるようにしているのと、実際の挙動に近づけるために delay を入れています。
 
 ```kotlin
-class FakeGithubRepoRepository(
+class FakeRepoRepository(
     private val repos: List<Repo>,
     bookmarkedRepos: List<Repo>,
 ) : GithubRepoRepository {
@@ -2985,7 +2985,10 @@ class HomeViewModelTest {
  }
 ```
 
-これでテストが通るようになったと思います。`HomeViewModel#onClickBookmark`も同様にテストを書いてみてください。
+これでテストが通るようになったと思います。
+
+実装例として下記に実装しています。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-8...reference/step-9
 
 </details>
 
