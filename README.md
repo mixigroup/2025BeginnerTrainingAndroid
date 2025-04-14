@@ -2265,18 +2265,18 @@ class GithubRepoRepository(
 
 ```mermaid
 erDiagram
-repos {
+repo {
   int id PK
   string name
   string description
   int stars
 }
 
-bookmark_repos {
+bookmark_repo {
   int repo_id PK, FK
 }
 
-repos ||--|| bookmark_repos : ""
+repo ||--|| bookmark_repo : ""
 ```
 
 <details>
