@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.beginnertrainingandroid2025.data.Repo
 import com.example.beginnertrainingandroid2025.data.RepoRemoteDataSource
 import com.example.beginnertrainingandroid2025.data.RepoRepository
+import com.example.beginnertrainingandroid2025.di.LocalDataSourceFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,7 +26,7 @@ class HomeViewModel(
         viewModelScope.launch {
             uiState.update {
                 it.copy(
-                    items = repository.getRepos(),
+                    items = repository.getRepoList(),
                 )
             }
         }
@@ -50,6 +51,7 @@ class HomeViewModel(
                 override fun <T : ViewModel> create(modelClass: Class<T>): T =
                     HomeViewModel(
                         repository = RepoRepository(
+                            localDataSource = LocalDataSourceFactory.createRepoLocalDataSource(),
                             remoteDataSource = RepoRemoteDataSource(),
                         ),
                     ) as T
