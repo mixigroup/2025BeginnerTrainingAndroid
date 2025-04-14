@@ -1139,12 +1139,12 @@ private fun RepoListItemPreview(
 ```kotlin
 @Composable
 fun HomeScreen(
-    items: List<Repo>,
+    repos: List<Repo>,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        items.forEach {
-            RepoListItem(item = it)
+        repos.forEach {
+            RepoListItem(repo = it)
         }
     }
 }
@@ -1157,10 +1157,10 @@ fun HomeScreen(
 ```kotlin
 LazyColumn(modifier = modifier) {
     items(
-        items = items,
+        items = repos,
         key = { it.id },
     ) {
-        RepoListItem(item = it)
+        RepoListItem(repo = it)
     }
 }
 ```
@@ -1184,10 +1184,10 @@ Scaffold(
 ) {
     LazyColumn {
         items(
-            items = uiState.items,
+            items = uiState.repos,
             key = { it.id },
-        ) { item ->
-            RepoListItem(item = item)
+        ) { repo ->
+            RepoListItem(repo = repo)
         }
     }
 }
@@ -1221,7 +1221,7 @@ Scaffold(
 +             modifier = Modifier.padding(innerPadding),
 +         ) {
         items(
-            items = uiState.items,
+            items = uiState.repos,
             key = { it.id },
 ```
 
@@ -1600,7 +1600,7 @@ get メソッドは suspend 関数のため、呼び出すには Coroutine Scope
 +
      HomeScreen(
          modifier = modifier,
-         items = emptyList(),
+         repos = emptyList(),
 ```
 
 取得したリポジトリを表示できるようにしましょう。`List<Repo>`を監視して、取得に成功したら更新するようにします。監視するためには State オブジェクトにします。また、remember を使って Recomposition で関数が再実行されても値を記憶させます。
@@ -1609,17 +1609,17 @@ get メソッドは suspend 関数のため、呼び出すには Coroutine Scope
  fun HomeScreen(
      modifier: Modifier = Modifier,
  ) {
-+    var items = remember { mutableStateListOf<Repo>() }
++    var repos = remember { mutableStateListOf<Repo>() }
 +
      LaunchedEffect(Unit) {
          val result: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
-+        items.addAll(result)
++        repos.addAll(result)
      }
 
      HomeScreen(
          modifier = modifier,
--        items = emptyList(),
-+        items = items,
+-        repos = emptyList(),
++        repos = repos,
      )
  }
 ```
@@ -1788,7 +1788,7 @@ class HogeViewModel(private val repository: Repository): ViewModel() {
 
 ```kotlin
 data class HomeUiState(
-    val items: List<Repo>,
+    val repos: List<Repo>,
 )
 ```
 
@@ -1798,17 +1798,17 @@ ViewModel を作成します。一旦、HTTP クライアントを直接使う�
 class HomeViewModel: ViewModel() {
     var uiState = MutableStateFlow(
         HomeUiState(
-            items = emptyList(),
+            repos = emptyList(),
         )
     )
         private set
 
     fun onLaunched() {
         viewModelScope.launch {
-            val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
+            val repos: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
             uiState.update {
                 it.copy(
-                    items = items,
+                  repos = repos,
                 )
             }
         }
@@ -1866,15 +1866,15 @@ ViewModel で Repository を使います。
 +): ViewModel() {
      var uiState = MutableStateFlow(
          HomeUiState(
-             items = emptyList(),
+             repos = emptyList(),
 
      fun onLaunched() {
          viewModelScope.launch {
--            val items: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
+-            val repos: List<Repo> = httpClient.get("https://api.github.com/orgs/mixigroup/repos").body()
              uiState.update {
                  it.copy(
--                    items = items,
-+                    items = repository.getRepoList(),
+-                    repos = repos,
++                    repos = repository.getRepoList(),
                  )
              }
          }
@@ -1994,7 +1994,7 @@ https://github.com/user-attachments/assets/defa3890-2422-4a2f-a227-902a3fe7fd89
 ```kotlin
 @Composable
 fun RepoListItem(
-    item: Repo,
+    repo: Repo,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -2006,17 +2006,17 @@ fun RepoListItem(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
-                text = item.name,
+                text = repo.name,
                 fontWeight = FontWeight.Bold,
             )
-            item.description?.let { Text(text = it) }
+            repo.description?.let { Text(text = it) }
             Row {
                 Icon(
                     imageVector = Icons.Outlined.Star,
                     tint = Color.LightGray,
                     contentDescription = null,
                 )
-                Text(text = "${item.stars}")
+                Text(text = "${repo.stars}")
             }
         }
 
@@ -2035,23 +2035,23 @@ fun RepoListItem(
 
 ```diff
  data class HomeUiState(
-     val items: List<Repo>,
-+    val bookmarkedItems: Set<Repo>,
+     val repos: List<Repo>,
++    val bookmarkedRepos: Set<Repo>,
  )
 ```
 
 次にブックマークアイコンがタップされた時に発火させるコールバックを`HomeViewModel`に実装します。
 
 ```kotlin
-fun onBookmarkIconClick(item: Repo) {
+fun onBookmarkIconClick(repo: Repo) {
     uiState.update {
-        val bookmarkedItems = if (item in uiState.value.bookmarkedItems) {
-            it.bookmarkedItems - item
+        val bookmarkedRepos = if (repo in uiState.value.bookmarkedRepos) {
+            it.bookmarkedRepos - repo
         } else {
-            it.bookmarkedItems + item
+            it.bookmarkedRepos + repo
         }
 
-        it.copy(bookmarkedItems = bookmarkedItems)
+        it.copy(bookmarkedRepos = bookmarkedRepos)
     }
 }
 ```
@@ -2060,7 +2060,7 @@ fun onBookmarkIconClick(item: Repo) {
 
 ```diff
  fun RepoListItem(
-     item: Repo,
+     repo: Repo,
      isBookmarked: Boolean,
 +    onBookmarkIconClick: (Repo) -> Unit,
      modifier: Modifier = Modifier,
@@ -2071,7 +2071,7 @@ fun onBookmarkIconClick(item: Repo) {
          }
 
 -        IconButton(onClick = {}) {
-+        IconButton(onClick = { onBookmarkIconClick(item) }) {
++        IconButton(onClick = { onBookmarkIconClick(repo) }) {
              Icon(
                  painter = painterResource(
                      if (isBookmarked) R.drawable.bookmark_filled else R.drawable.bookmark
@@ -2079,7 +2079,7 @@ fun onBookmarkIconClick(item: Repo) {
 
 ```diff
    fun RepoListItem(
-         IconButton(onClick = { onBookmarkIconClick(item) }) {
+         IconButton(onClick = { onBookmarkIconClick(repo) }) {
              Icon(
 -                painter = painterResource(R.drawable.bookmark),
 +                painter = painterResource(
@@ -2110,11 +2110,11 @@ fun onBookmarkIconClick(item: Repo) {
      Scaffold(
 
  ...
-              ) { item ->
+              ) { repo ->
                  RepoListItem(
-                     item = item,
+                     repo = repo,
 +                    onBookmarkIconClick = onBookmarkIconClick,
-+                    isBookmarked = item in uiState.bookmarkedItems,
++                    isBookmarked = repo in uiState.bookmarkedRepos,
                  )
              }
          }
@@ -2487,23 +2487,23 @@ fun onLaunched() {
     viewModelScope.launch {
         uiState.update {
             it.copy(
-                items = repository.getRepoList(),
-                bookmarkedItems = repository.getBookmarkedRepoList().toSet(),
+                repos = repository.getRepoList(),
+                bookmarkedRepos = repository.getBookmarkedRepoList().toSet(),
             )
         }
     }
 }
 
-fun onBookmarkIconClick(item: Repo) {
+fun onBookmarkIconClick(repo: Repo) {
     viewModelScope.launch {
         uiState.update {
-            if (item in uiState.value.bookmarkedItems) {
-                repository.saveAsUnBookmark(item)
+            if (repo in uiState.value.bookmarkedRepos) {
+                repository.saveAsUnBookmark(repo)
             } else {
-                repository.saveAsBookmark(item)
+                repository.saveAsBookmark(repo)
             }
 
-            it.copy(bookmarkedItems = repository.getBookmarkedRepoList().toSet())
+            it.copy(bookmarkedRepos = repository.getBookmarkedRepoList().toSet())
         }
     }
 }
@@ -2906,8 +2906,8 @@ fun onLaunchedTest() {
 
 		assertEquals(
 		    HomeUiState(
-		        items = repos,
-		        bookmarkedItems = emptySet(),
+		        repos = repos,
+		        bookmarkedRepos = emptySet(),
 		    ),
 		    viewModel.uiState.value,
 		)
@@ -2951,8 +2951,8 @@ class HomeViewModelTest {
 
 とりあえずテストは実行できるようになりました。しかし、意図通りの値が入っておらずテストに失敗しています。原因はフェイクの Repository で`delay`で待っているからです。`delay`が終了するのを待たずにテストが実行されて`assert`で失敗しています。
 
-> Expected :HomeUiState(items=[Repo(id=1, name=fake repo1, description=null, stars=12), Repo(id=2, name=fake repo2, description=this is fake repository, stars=3)], bookmarkedItems=[])
-> Actual :HomeUiState(items=[], bookmarkedItems=[])
+> Expected :HomeUiState(repos=[Repo(id=1, name=fake repo1, description=null, stars=12), Repo(id=2, name=fake repo2, description=this is fake repository, stars=3)], bookmarkedRepos=[])
+> Actual :HomeUiState(repos=[], bookmarkedRepos=[])
 
 どうすれば`delay`の完了を待てるのでしょうか？実は`delay`を良い感じにスキップしてくれるテスト用の API があります。`runTest`です。
 
@@ -2975,8 +2975,8 @@ class HomeViewModelTest {
 
        assertEquals(
           HomeUiState(
-              items = repos,
-              bookmarkedItems = emptySet(),
+              repos = repos,
+              bookmarkedRepos = emptySet(),
           ),
           viewModel.uiState.value,
        )
