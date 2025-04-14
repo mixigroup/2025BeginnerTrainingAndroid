@@ -29,7 +29,7 @@ Android アプリは、いまや様々なプログラミング言語で開発す
 
 # Kotlin について
 
-Kotlin は、JetBrains 社によって開発された静的型付けのプログラミング言語です。オープンソースとして[GitHub](https://github.com/JetBrains/kotlin)で公開されています。Java プログラムとの相互運用性を保ちながら、可読性を損なわず簡潔にプログラミングできるため、多くの開発者が好んで使っています。
+Kotlin は、JetBrains 社によって開発された静的型付けのプログラミング言語です。オープンソースとして[GitHub](https://github.com/JetBrains/kotlin)で公開されています。Java プログラムとの相互運用性を保ちながら、可読性が高く簡潔にプログラミングできるため、多くの開発者に利用されています。
 
 ## Kotlin の基礎知識
 
