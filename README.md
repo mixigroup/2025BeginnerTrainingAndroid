@@ -2133,18 +2133,20 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-
 
 ## Step 7 : データを端末内に永続化する
 
-今の状態ではアプリを終了した時にブックマークしたリポジトリの状態が失われてしまいます。次はブックマークした情報を端末に永続化して、アプリを終了しても情報を記憶できるようにしてみます。
+今の状態では、アプリを終了した時にブックマークしたリポジトリの情報が失われてしまいます。次はブックマークした情報を端末に永続化して記憶できるようにしましょう。
 
-データの永続化方法は大きく分けて 2 つあります。
+### 永続化の方法
 
-- ファイルへの保存
-  - Jetpack DataStore という公式ライブラリが用意されている
-- データベースへの保存
-  - Jetpack Room という公式ライブラリが用意されている
+データの永続化方法は大きく分けて 2 つありますが、今回はデータ量がそこそこ多いためデータベース（Jetpack Room）を使います。
 
-### Room について
+| 保存先       | ライブラリ名      | 使い分け                                                           |
+| ------------ | ----------------- | ------------------------------------------------------------------ |
+| ファイル     | Jetpack DataStore | 保存するデータが設定などのフラグやデータ量が少ない時に使う         |
+| データベース | Jetpack Room      | 保存するデータが大量で部分更新や参照生合性をサポートしたい時に使う |
 
-Room とは Google が開発している公式の DB ライブラリです。SQLite を抽象化しているので DAO のように扱えます。
+### Jetpack Room について
+
+Jetpack Room (以下、Room)とは Google が開発している公式の DB ライブラリです。SQLite を抽象化しています。
 
 **依存の追加**
 
@@ -2211,11 +2213,11 @@ abstract class AppDatabase : RoomDatabase() {
 **DAO のインスタンス化**
 
 ```kotlin
-val appDatabase =  Room.databaseBuilder(
-		    app,
-		    AppDatabase::class.java,
-		    "app_database",
-		).build()
+val appDatabase = Room.databaseBuilder(
+                        app,
+                        AppDatabase::class.java,
+                        "app_database",
+                  ).build()
 
 val dao = appDatabase.repoDao()
 ```
