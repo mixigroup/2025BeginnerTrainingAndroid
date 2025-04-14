@@ -1,5 +1,6 @@
 package com.example.beginnertrainingandroid2025
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
@@ -47,16 +48,16 @@ fun BeginnerTrainingAndroid2025(modifier: Modifier = Modifier) {
             bottomBar = {
                 BottomNavigationBar(navController = navController)
             },
-        ) {
+        ) { padding ->
             NavHost(navController = navController, startDestination = Home) {
                 // ホーム画面
                 composable<Home> {
-                    HomeScreen()
+                    HomeScreen(modifier = Modifier.padding(bottom = padding.calculateBottomPadding()))
                 }
 
                 // ブックマーク画面
                 composable<Bookmark> {
-                    BookmarkScreen()
+                    BookmarkScreen(modifier = Modifier.padding(bottom = padding.calculateBottomPadding()))
                 }
             }
         }
