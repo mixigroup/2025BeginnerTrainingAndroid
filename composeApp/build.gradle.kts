@@ -1,6 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.konan.properties.loadProperties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -67,6 +68,11 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+
+        val properties = properties.apply {
+            loadProperties(project.rootProject.file("local.properties").path)
+        }
+        buildConfigField("String", "GITHUB_API_TOKEN", "\"${properties["GITHUB_API_TOKEN"]}\"")
     }
     packaging {
         resources {
@@ -81,6 +87,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    buildFeatures {
+        buildConfig = true // BuildConfigを生成するフラグ
     }
 }
 
