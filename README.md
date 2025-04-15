@@ -3087,6 +3087,4 @@ Google と Jetbrains から公式に公開されているリソースを紹介�
 
 ## 公式チュートリアル
 
-Google から公式のチュートリアルが公開されています。
-
 https://developer.android.com/get-started/codelabs
