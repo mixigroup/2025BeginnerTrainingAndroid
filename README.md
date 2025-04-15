@@ -3053,3 +3053,40 @@ https://www.jetbrains.com/help/kotlin-multiplatform-dev/supported-platforms.html
 https://github.com/mixigroup/2025BeginnerTrainingAndroid/tree/reference/step-10 のブランチに切り替えて、iOS でもアプリを動かしてみましょう。
 
 時間があれば、差分を眺めて普通の Android アプリとはどう違うかを調べてみましょう！
+
+※ ブランチを切り替えたら Sync してください（赤矢印）
+※ Android アプリをビルド&インストールするに は composeApp、iOS は iosApp を選択してください
+
+# 補足
+
+Google と Jetbrains から公式に公開されているリソースを紹介します。
+この研修では触れられなかった内容も多くあるので、興味があればぜひ見てみてください。
+
+## 公式サンプルアプリ
+
+- Now in Android App
+  - 実用的なアプリをモダンな技術スタックを使って実装している
+  - https://github.com/android/nowinandroid
+- Jetpack Compose Samples
+  - Compose を使ってさまざまな UI を実装している
+  - https://github.com/android/compose-samples
+- Kotlin Multiplatform samples
+  - KMP/CMP を使ってマルチプラットフォーム対応のアプリを実装している
+  - https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-samples.html
+
+## 公式ブログ
+
+- Android Developers Blog
+  - https://android-developers.googleblog.com/
+- Android Developers
+  - https://medium.com/androiddevelopers
+- Kotlin
+  - https://blog.jetbrains.com/ja/kotlin/
+- Material Desing Blog
+  - https://m3.material.io/blog
+
+## 公式チュートリアル
+
+Google から公式のチュートリアルが公開されています。
+
+https://developer.android.com/get-started/codelabs
