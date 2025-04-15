@@ -9,6 +9,7 @@ import com.example.beginnertrainingandroid2025.data.Repo
 import com.example.beginnertrainingandroid2025.data.RepoLocalDataSource
 import com.example.beginnertrainingandroid2025.data.RepoRemoteDataSource
 import com.example.beginnertrainingandroid2025.data.RepoRepository
+import com.example.beginnertrainingandroid2025.di.LocalDataSourceFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -60,7 +61,7 @@ class HomeViewModel(
                 ): T =
                     HomeViewModel(
                         repository = DefaultRepoRepository(
-                            localDataSource = RepoLocalDataSource(),
+                            localDataSource = LocalDataSourceFactory.createRepoLocalDataSource(),
                             remoteDataSource = RepoRemoteDataSource(),
                         ),
                     ) as T

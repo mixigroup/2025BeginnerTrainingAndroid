@@ -8,6 +8,7 @@ import com.example.beginnertrainingandroid2025.data.DefaultRepoRepository
 import com.example.beginnertrainingandroid2025.data.Repo
 import com.example.beginnertrainingandroid2025.data.RepoLocalDataSource
 import com.example.beginnertrainingandroid2025.data.RepoRemoteDataSource
+import com.example.beginnertrainingandroid2025.di.LocalDataSourceFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -47,7 +48,7 @@ class BookmarkViewModel(
             override fun <T : ViewModel> create(modelClass: KClass<T>, extras: CreationExtras): T {
                 return BookmarkViewModel(
                     repository = DefaultRepoRepository(
-                        localDataSource = RepoLocalDataSource(),
+                        localDataSource = LocalDataSourceFactory.createRepoLocalDataSource(),
                         remoteDataSource = RepoRemoteDataSource(),
                     ),
                 ) as T
