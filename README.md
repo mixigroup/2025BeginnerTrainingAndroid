@@ -3055,6 +3055,7 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/tree/reference/step-10 
 時間があれば、差分を眺めて普通の Android アプリとはどう違うかを調べてみましょう！
 
 ※ ブランチを切り替えたら Sync してください（赤矢印）
+
 ※ Android アプリをビルド&インストールするに は composeApp、iOS は iosApp を選択してください
 
 ![スクリーンショット 2025-04-15 14 27 00](https://github.com/user-attachments/assets/f8d82771-f652-4026-9c33-1af994fefc0a)
