@@ -3051,4 +3051,7 @@ KMP を導入するにはいくつか準備が必要です。まずは Xcode を
 
 次に KMP 用のプラグインを Android Studio にインストールします。
 
-{Github のリンク}で演習で作成したアプリを CMP 対応しました。時間があれば、iOS でも動作するか確認してみましょう。また、差分を眺めて普通の Android アプリとはどう違うかを調べてみましょう！
+以下で演習で作成したアプリを CMP 対応しています。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-9...reference/step-10
+
+時間があれば、iOS でも動作するか確認してみましょう。また、差分を眺めて普通の Android アプリとはどう違うかを調べてみましょう！
