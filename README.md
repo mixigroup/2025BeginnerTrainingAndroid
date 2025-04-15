@@ -3041,17 +3041,15 @@ Android は安定版がリリースされていますが、iOS はまだベー�
 
 https://www.jetbrains.com/help/kotlin-multiplatform-dev/supported-platforms.html#current-platform-stability-levels-for-compose-multiplatform-ui-framework
 
-### CMP で iOS でも動かせるようにする
+### 環境構築
 
-**環境構築**
+以下のツールをインストールしてください。詳細は https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-setup.html を参考にしてください。
 
-KMP を導入するにはいくつか準備が必要です。まずは Xcode をインストールしてください。
+- Xcode
+- Kotlin Multiplatform plugin
 
-次にシミュレータを用意してください。実機がある方は実機で ok です。
+### 演習
 
-次に KMP 用のプラグインを Android Studio にインストールします。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/tree/reference/step-10 のブランチに切り替えて、iOS でもアプリを動かしてみましょう。
 
-以下で演習で作成したアプリを CMP 対応しています。
-https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-9...reference/step-10
-
-時間があれば、iOS でも動作するか確認してみましょう。また、差分を眺めて普通の Android アプリとはどう違うかを調べてみましょう！
+時間があれば、差分を眺めて普通の Android アプリとはどう違うかを調べてみましょう！
