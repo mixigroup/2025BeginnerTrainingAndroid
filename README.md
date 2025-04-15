@@ -509,6 +509,8 @@ Wi-Fi で接続する場合は、青矢印の部分をクリックします。
 
 この章では、Github にある mixigroup のリポジトリを取得し、ブックマークできるアプリを作成します。
 
+https://github.com/user-attachments/assets/5f80fea3-961a-4b8c-a3a8-2cf5e368044e
+
 演習ではアプリを完成させるまでの道のりをステップに分けています。
 
 - [Step 0 : Jetpack Compose の基本について学習する](#step-0--jetpack-compose-の基本について学習する)
@@ -1633,7 +1635,7 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-
 
 ## Step 5 : アプリアーキテクチャの導入
 
-ここまでで、API からリポジトリを取得して画面に表示できるようになりました。しかし、全ての処理が Composable 関数に実装されており、担っている責務が必要以上に大きいように見えます。テストも非常に書きづらいです。そこでアーキテクチャを導入し、処理を適切な単位で分割していくことにします。
+ここまでで、API からリポジトリを取得して画面に表示できるようになりました。しかし、全ての処理が Composable 関数に実装されており、受け持つ責務が必要以上に大きいように見えます。テストも非常に書きづらいです。そこでアーキテクチャを導入し、処理を適切な単位で分割していくことにします。
 
 ### アーキテクチャについて
 
@@ -1658,15 +1660,13 @@ https://developer.android.com/topic/architecture
 
 ※ ドキュメントでは UI 層と Data 層の間に Domain 層が optional として存在しますが、今回は省略します。
 
-```mermaid
-flowchart TD;
-
-UI層 --> Data層
-```
+<img src="https://github.com/user-attachments/assets/46ba9eed-232a-4332-8d0b-98381e8cba8a" width="300">
 
 **UI 層**
 
 UI の表示処理を主に担うレイヤーです。UI 層はさらに以下のように分割することが推奨されています。
+
+<img src="https://github.com/user-attachments/assets/c2bb1bcc-e30e-47f7-9a0a-9d5522b34305" width="300">
 
 - **UI Elements**
   - 画面の UI を構成するコンポーネントです。例えば、ボタンやテキストなどです。
@@ -1682,13 +1682,17 @@ UI の表示処理を主に担うレイヤーです。UI 層はさらに以下�
 
 具体的には以下のような実装になるイメージです。
 
-ViewModel では UI の状態を UI State として公開します。UI State は一つのクラスに集約して定義します。
+まずは、UI の状態を定義します。
 
 ```kotlin
 data class MainUiState(
     val items: List<String>,
 )
+```
 
+State Holder である ViewModel では UI の状態を UI State として公開します。
+
+```kotlin
 class MainViewModel: ViewModel() {
     var uiState = MutableStateFlow(
         MainUiState(
@@ -1700,25 +1704,22 @@ class MainViewModel: ViewModel() {
 
 ```
 
-`Flow`はデータを連続的に送ることができるパイプのようなオブジェクトです。データを送りたい時は`update`か`setter`を呼び出します。
+`Flow`はデータを連続的に送ることができるパイプのようなオブジェクトです。データを送りたい時は`update`メソッドかセッターを呼び出します。
 
 ```kotlin
-uiState.update {
-    it.copy(items = items)
-}
-```
-
-```kotlin
+// どちらでもデータを送ることができる
+uiState.update { it.copy(items = items) }
 uiState.value = MainUiState(items = items)
 ```
 
-データを受け取りたい時は`Flow`を`collect`します。Composable 関数で受け取る場合は`collectAsStateWithLifecycle`を呼び出せば良いです。こうすれば UI State が ViewModel 側で更新されるたびに、Composable 関数に値が流れてきます。
+データを受け取るときは`Flow`を`collect`します。Composable 関数で受け取る場合は`collectAsStateWithLifecycle`を呼び出せば良いです。こうすれば UI State が ViewModel 側で更新されるたびに、Composable 関数に値が流れてきます。
 
 ```kotlin
 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 ```
 
 ViewModel の生成は下記のようにします。
+※ `androidx.lifecycle:lifecycle-viewmodel-compose` ライブラリの依存を追加する必要があります。
 
 ```kotlin
 val viewModel: MaianViewModel = ViewModel()
@@ -1726,37 +1727,55 @@ val viewModel: MaianViewModel = ViewModel()
 
 **Data 層**
 
-データの取得を担うレイヤーです。Data 層はさらに以下のように分割することが推奨されています。
+アプリデータの操作やビジネスロジックを含むレイヤーです。Data 層はさらに以下のように分割することが推奨されています。
+
+<img src="https://github.com/user-attachments/assets/622eb252-8a12-4ac0-9951-7af0b88e3d82" width="300">
 
 - Repository
-  - データを操作するレイヤーです
-  - ただし、データの保存先は隠蔽して利用側（今回でいえば State Holder）からはわからないようにします
+  - データソース（≒ データの保存先）を隠蔽するレイヤーです
+  - 関連するビジネスロジックも含む場合があります
 - RemoteDataSource
   - リモートにあるデータを操作するレイヤーです
-  - サーバーの API を叩く処理をここに実装します
+  - サーバーの API を叩く処理などはここに実装します
 - LocalDataSource
   - ローカルにあるデータを操作するレイヤーです
-  - 端末内にデータを保存する処理をここに実装します
+  - 端末内にデータを保存する処理などをここに実装します
 
 具体的には以下のような実装になるイメージです。
 
+単体テストしやすくするために、依存するクラスをコンストラクタで受け取るようにします。例えば、Repository では RemoteDataSource と LocalDataSource に依存するので、2 つ受け取っています。
+
 ```kotlin
 class Repository(
-    private val remoteDataSource = RemoteDataSource(),
-    private val localDataSource = LocalDataSource(),
-) {
-    suspend fun getItems(): List<String> {
-        // RemoteDataSourceとLocalDataSourceから値を取得する
-    }
-}
+    private val remoteDataSource: RemoteDataSource,
+    private val localDataSource: LocalDataSource,
+)
 ```
 
-ViewModel で利用できるようにします。
+データの操作には時間がかかります。Repository で公開する API は suspend 関数にして、コルーチン内で呼び出すことを強制させる方が良いでしょう。また、呼び出し元でスレッドを意識させないようにしてあげるとミスを防げます（この考え方をメインセーフと呼びます）。
 
 ```kotlin
-class MainViewModel(
-    private val repository = Repository(),
-): ViewModel()
+class Repository(
+    private val remoteDataSource: RemoteDataSource,
+    private val localDataSource: LocalDataSource,
+) {
+    // suspend 関数にして、呼び出し元でコルーチンを起動させる
+    suspend fun getRepoList(): List<Repo> {
+        return remoteDataSource.getRepoList()
+    }
+}
+
+class RemoteDataSource {
+    // withContextを使ってIO処理用のスレッドで実行させる
+    suspend fun getRepoList(): List<Repo> = withContext(Dispatchers.IO) {
+        return httpClient.get()
+    }
+}
+
+// ViewModelではスレッドを意識しなくて良い
+viewModelScope.launch {
+    val repoList = repository.getRepoList()
+}
 ```
 
 ### 演習
@@ -1942,7 +1961,7 @@ Button(onClick = onClick) {
 </td>
 <td>
 
-# TODO: 動画を貼る
+https://github.com/user-attachments/assets/ff56515e-43c6-4796-abd3-f0482d6c10e4
 
 </td>
 </tr>
@@ -2135,11 +2154,11 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-
 
 ## Step 7 : データを端末内に永続化する
 
-今の状態では、アプリを終了した時にブックマークしたリポジトリの情報が失われてしまいます。次はブックマークした情報を端末に永続化して記憶できるようにしましょう。
+今の状態では、アプリを終了した時にブックマークしたリポジトリの情報が失われてしまいます。データを永続化してアプリを再起動しても、ブックマークしたリポジトリが消去されないようにしてみましょう。
 
 ### 永続化の方法
 
-データの永続化方法は大きく分けて 2 つありますが、今回はデータ量がそこそこ多いためデータベース（Jetpack Room）を使います。
+データの永続化方法は大きく分けて 2 つありますが、今回はデータ量がそこそこ多いのとリレーションを貼りたいのでデータベース（Jetpack Room）を使います。
 
 | 保存先       | ライブラリ名      | 使い分け                                                           |
 | ------------ | ----------------- | ------------------------------------------------------------------ |
@@ -2158,38 +2177,41 @@ Room を利用するには、以下の依存を追加する必要があります
 - `androidx.room:room-ktx`
 - `androidx.room:room-runtime`
 
-また、アノテーションを解析する必要があるのでパースするプラグイン（KSP）も追加します。
+また、ライブラリ側でアノテーション（`@Composable`などがアノテーション）をパースする必要があるので KSP（Kotlin Symbol Processing）というプラグインも追加します。
 
 - `com.google.devtools.ksp`
 
 **スキーマの定義**
 
 Room ではテーブルのスキーマを Kotlin のオブジェクトで表現できます。
+デフォルトではクラス名がテーブル名になりますが、`@Entity`アノテーションを使って変更できます。
 
 ```kotlin
 @Entity(
     tableName = "items",
 )
 data class ItemEntity(
-    @PrimaryKey val id: Int,
+    @PrimaryKey val id: Int, // プライマリキーを指定
     val isAdded: Boolean,
 )
 ```
 
 **DAO の定義**
 
-DAO は以下のように定義できます。
+DAO（Data Access Object） は以下のように定義できます。
+
+※ DAO : データベースにアクセスするためのオブジェクト
 
 ```kotlin
 @Dao
 interface ItemDao {
-    @Insert
+    @Insert // Insert文を発行するメソッドにできる
     suspend fun insert(item: ItemEntity)
 
     @Insert
     suspend fun insertAll(vararg item: ItemEntity)
 
-    @Query("SELECT * FROM repo")
+    @Query("SELECT * FROM repo") // 生のクエリをかける
     suspend fun findAll(): List<RepoEntity>
 
     @Delete
@@ -2199,24 +2221,27 @@ interface ItemDao {
 
 **データベースの作成**
 
+DAO インスタンスを生成するデータベースクラスを定義します。
+
 ```kotlin
 @Database(
     entities = [
-        RepoEntity::class,
-        BookmarkRepoEntity::class,
+        ItemEntity::class, // スキーマオブジェクトを渡す
     ],
     version = 1,
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun repoDao(): RepoDao
+    abstract fun itemDao(): ItemDao // DAO を返すメソッドを定義
 }
 ```
 
 **DAO のインスタンス化**
 
+実際に DAO インスタンスを生成するときは以下のようにします。
+
 ```kotlin
 val appDatabase = Room.databaseBuilder(
-                        app,
+                        app, // Application（後述）オブジェクトが必要
                         AppDatabase::class.java,
                         "app_database",
                   ).build()
@@ -2224,7 +2249,7 @@ val appDatabase = Room.databaseBuilder(
 val dao = appDatabase.repoDao()
 ```
 
-### Dependency Injection
+### ファクトリの実装
 
 DAO のインスタンスを注入するために、簡易的な Factory を実装します。
 
@@ -2232,13 +2257,16 @@ DAO のインスタンスを注入するために、簡易的な Factory を実�
 object LocalDataSourceFactory
 ```
 
-Application のインスタンスが必要なので Application クラスの onCreate で初期化することにします。
+DAO のインスタンスを作りには、Application オブジェクトが必要です。`Application`オブジェクトはカスタムで定義できる`MyApplication`クラスの`onCreate`で取得することにします。
+
+※ Application オブジェクト : アプリのパッケージ名など全体的な設定が含まれるオブジェクトです
+※ `MyApplication` : Application は一番最初にインスタンスが作られます。これを継承して自作の Application クラスを作成できます。初期化処理などが実装される場合が多いです。
 
 ```kotlin
 object LocalDataSourceFactory {
     private lateinit var appDatabase: AppDatabase
 
-    fun initialize(app: MyApplication) {
+    fun initialize(app: Application) {
         appDatabase =  Room.databaseBuilder(
             app,
             AppDatabase::class.java,
@@ -2258,14 +2286,7 @@ class MyApplication: Application() {
 }
 ```
 
-Repository では作成した Factory を使って LocalDataSource のインスタンスを受け取るようにします。
-
-```kotlin
-class GithubRepoRepository(
-    private val localDataSource: GithubRepoLocalDataSource = LocalDataSourceFactory.createGithubRepoLocalDataSource(),
-    private val remoteDataSource: GithubRepoRemoteDataSource = GithubRepoRemoteDataSource(),
-)
-```
+`MyAppllication` は `AndroidManifest.xml` に登録する必要があります。
 
 ### 演習
 
@@ -2605,8 +2626,6 @@ NavigationBar(modifier = modifier) {
       )
 }
 ```
-
-![スクリーンショット 2025-04-07 4.34.52.png](attachment:b52c50e7-b731-4f75-806f-9c242d0c68d9:スクリーンショット_2025-04-07_4.34.52.png)
 
 あとは同様にブックマーク画面に遷移するアイコンを表示します。
 
@@ -3032,4 +3051,7 @@ KMP を導入するにはいくつか準備が必要です。まずは Xcode を
 
 次に KMP 用のプラグインを Android Studio にインストールします。
 
-{Github のリンク}で演習で作成したアプリを CMP 対応しました。時間があれば、iOS でも動作するか確認してみましょう。また、差分を眺めて普通の Android アプリとはどう違うかを調べてみましょう！
+以下で演習で作成したアプリを CMP 対応しています。
+https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-9...reference/step-10
+
+時間があれば、iOS でも動作するか確認してみましょう。また、差分を眺めて普通の Android アプリとはどう違うかを調べてみましょう！
