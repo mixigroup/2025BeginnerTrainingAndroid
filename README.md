@@ -2216,7 +2216,7 @@ interface ItemDao {
     suspend fun findAll(): List<RepoEntity>
 
     @Delete
-    suspend fun delete()
+    suspend fun delete(item: ItemEntity)
 }
 ```
 
