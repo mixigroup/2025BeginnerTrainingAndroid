@@ -2289,6 +2289,12 @@ class MyApplication: Application() {
 
 `MyAppllication` は `AndroidManifest.xml` に登録する必要があります。
 
+```xml
+<application
+    android:name=".MyApplication"
+    ... >
+```
+
 ### 演習
 
 ブックマークしたリポジトリを永続化できるようにしましょう。
