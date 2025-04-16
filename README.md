@@ -1097,7 +1097,7 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/main...referenc
 
 </details>
 
-### テクニック
+### Tips: プレビュー用のデータセットを作成する
 
 プレビューは複数定義できるので、概要がない場合の UI もプレビューで表示できるようにしたいです。もう一つプレビュー用の Composable 関数を追加しても良いですが、プレビューで確認したい状態が増える度に追加するのも少し面倒です。そんな時は`PreviewParameterProvider`を使うと楽にできます。
 
