@@ -1982,9 +1982,10 @@ class ViewModel() {
 リスナーは下記のように渡せます。
 
 ```kotlin
-// どっちでもリスナーを渡せる
-Button(onClick = viewModel::onClick)
+// ラムダ式で渡す
 Button(onClick = { viewModel.onClick() })
+// 関数参照で渡す
+Button(onClick = viewModel::onClick)
 ```
 
 ### リソースを取り込む
