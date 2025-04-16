@@ -953,12 +953,13 @@ Box(
 早速リポジトリの情報を表示できるようにしましょう。プレビューで確認できれば ok です。その責務を担うコンポーネントは`RepoListItem`として定義することにします。
 
 ```kotlin
-// I/F
 @Composable
 fun RepoListItem(
     repo: Repo,
     modifier: Modifier = Modifier,
-)
+) {
+    // ToDo: repo.title, repo.description, repo.stars を表示する
+}
 ```
 
 `Repo`は表示するリポジトリの情報を表現するクラスです。`Repo`には以下の情報を含ませています。
