@@ -1722,7 +1722,7 @@ ViewModel の生成は下記のようにします。
 ※ `androidx.lifecycle:lifecycle-viewmodel-compose` ライブラリの依存を追加する必要があります。
 
 ```kotlin
-val viewModel: MaianViewModel = ViewModel()
+val viewModel: MainViewModel = ViewModel()
 ```
 
 **Data 層**
@@ -2164,7 +2164,7 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-
 | 保存先       | ライブラリ名      | 使い分け                                                           |
 | ------------ | ----------------- | ------------------------------------------------------------------ |
 | ファイル     | Jetpack DataStore | 保存するデータが設定などのフラグやデータ量が少ない時に使う         |
-| データベース | Jetpack Room      | 保存するデータが大量で部分更新や参照生合性をサポートしたい時に使う |
+| データベース | Jetpack Room      | 保存するデータが大量で部分更新や参照整合性をサポートしたい時に使う |
 
 ### Jetpack Room について
 
@@ -2247,7 +2247,7 @@ val appDatabase = Room.databaseBuilder(
                         "app_database",
                   ).build()
 
-val dao = appDatabase.repoDao()
+val dao = appDatabase.itemDao()
 ```
 
 ### ファクトリの実装
@@ -2258,7 +2258,7 @@ DAO のインスタンスを注入するために、簡易的な Factory を実�
 object LocalDataSourceFactory
 ```
 
-DAO のインスタンスを作りには、Application オブジェクトが必要です。`Application`オブジェクトはカスタムで定義できる`MyApplication`クラスの`onCreate`で取得することにします。
+DAO のインスタンスを作るには、Application オブジェクトが必要です。`Application`オブジェクトはカスタムで定義できる`MyApplication`クラスの`onCreate`で取得することにします。
 
 ※ Application オブジェクト : アプリのパッケージ名など全体的な設定が含まれるオブジェクトです
 ※ `MyApplication` : Application は一番最初にインスタンスが作られます。これを継承して自作の Application クラスを作成できます。初期化処理などが実装される場合が多いです。
@@ -2699,7 +2699,7 @@ NavigationBar(modifier = modifier) {
                  Icon(
 ```
 
-アプリ下部に遷移バーを表示したければ、前出した`Scaffold`を使います。`bottomBar`に Composable 関数を渡せばそれを下側に表示できます。
+アプリ下部に遷移バーを表示したければ、前述した`Scaffold`を使います。`bottomBar`に Composable 関数を渡せばそれを下側に表示できます。
 
 ```kotlin
 @Composable
