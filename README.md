@@ -2918,36 +2918,36 @@ class HomeViewModelTest {}
 ```kotlin
 @Test
 fun onLaunchedTest() {
-		val repos = listOf(
-		        Repo(
-		            id = 1,
-		            name = "fake repo1",
-		            stars = 12,
-		        ),
-		        Repo(
-		            id = 2,
-		            description = "this is fake repository",
-		            name = "fake repo2",
-		            stars = 3,
-		        ),
-	  )
-
-	  val viewModel = HomeViewModel(
-	        repository = FakeGithubRepoRepository(
-              repos = repos,
-              bookmarkedRepos = emptyList(),
-          ),
-	  )
-
-	  viewModel.onLaunched()
-
-		assertEquals(
-		    HomeUiState(
-		        repos = repos,
-		        bookmarkedRepos = emptySet(),
-		    ),
-		    viewModel.uiState.value,
-		)
+    val repos = listOf(
+        Repo(
+            id = 1,
+            name = "fake repo1",
+            stars = 12,
+        ),
+        Repo(
+            id = 2,
+            description = "this is fake repository",
+            name = "fake repo2",
+            stars = 3,
+        ),
+    )
+  
+    val viewModel = HomeViewModel(
+        repository = FakeGithubRepoRepository(
+            repos = repos,
+            bookmarkedRepos = emptyList(),
+        ),
+    )
+  
+    viewModel.onLaunched()
+  
+    assertEquals(
+        HomeUiState(
+            repos = repos,
+            bookmarkedRepos = emptySet(),
+        ),
+        viewModel.uiState.value,
+    )
 }
 ```
 
@@ -2997,26 +2997,26 @@ class HomeViewModelTest {
  @Test
 -fun onLaunchedTest() {
 +fun onLaunchedTest() = runTest {
-                val repos = listOf(
-                        Repo(
-                            id = 1,
+    val repos = listOf(
+        Repo(
+            id = 1,
 ```
 
 あとは`assert`の前に時間を進める API を呼んであげれば良いです。
 
 ```diff
-          )
+     )
 
-       viewModel.onLaunched()
-+      advanceUntilIdle()
+     viewModel.onLaunched()
++    advanceUntilIdle()
 
-       assertEquals(
-          HomeUiState(
-              repos = repos,
-              bookmarkedRepos = emptySet(),
-          ),
-          viewModel.uiState.value,
-       )
+     assertEquals(
+         HomeUiState(
+             repos = repos,
+             bookmarkedRepos = emptySet(),
+         ),
+         viewModel.uiState.value,
+     )
  }
 ```
 
