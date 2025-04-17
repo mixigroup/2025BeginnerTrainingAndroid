@@ -534,12 +534,19 @@ https://github.com/user-attachments/assets/5f80fea3-961a-4b8c-a3a8-2cf5e368044e
 
 1. リポジトリの URL をコピー
 
+![スクリーンショット 2025-04-18 7 23 19](https://github.com/user-attachments/assets/9e97f460-52e4-40de-b24c-1cb4324ec458)
+
 2. リポジトリのクローン
 
 すでにプロジェクトを開いている場合は、左上のアプリ名から「Clone Repository」を選択して、クローンしてください。
 
+![スクリーンショット 2025-04-18 7 26 47](https://github.com/user-attachments/assets/4f068366-2865-433b-9e23-cff01b07c746)
+
 URL: 1.で取得したリポジトリの URL を入力してください。
+
 Directory: リポジトリを保存する場所を選択してください。
+
+![スクリーンショット 2025-04-18 7 25 06](https://github.com/user-attachments/assets/0a14cfbc-82c9-49fa-a030-aeebac4413c7)
 
 Clone をクリックすると、リポジトリのクローンが始まります。
 
@@ -547,7 +554,12 @@ Clone をクリックすると、リポジトリのクローンが始まりま�
 
 This Window を選択してプロジェクトを開いてください。
 
+![スクリーンショット 2025-04-18 7 29 35](https://github.com/user-attachments/assets/9724568a-a349-473c-8457-4c21e157bee8)
+
 ※ Android Studio でプロジェクトを開いていない場合は、起動した際に表示される以下の画面から「Clone Repository」を選択してください。すでにクローンしたリポジトリを開きたい場合は、「Open」を選択してください。
+
+![スクリーンショット 2025-04-18 7 24 36](https://github.com/user-attachments/assets/decf81af-e570-4cd3-a051-e6e10c4c9a30)
+
 
 ## Step 0 : Jetpack Compose の基本について学習する
 
