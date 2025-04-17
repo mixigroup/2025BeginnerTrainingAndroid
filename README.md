@@ -405,9 +405,10 @@ fun main() {
 
 サンプルコードを Kotlin Playground で実行してみましょう。
 
-余裕があれば公式ドキュメントを眺めて、気になる機能を調べてみましょう。
+余裕があれば[公式ドキュメント](https://kotlinlang.org/docs/home.html)で以下について調べてみましょう。
 
-https://kotlinlang.org/docs/home.html
+- 例外
+- List や Set などのコレクション
 
 # Android Studio について
 
