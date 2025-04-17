@@ -528,6 +528,27 @@ https://github.com/user-attachments/assets/5f80fea3-961a-4b8c-a3a8-2cf5e368044e
 
 各ステップで学習する量はなるべく大きすぎないように設計しています。必要な情報は都度解説をつけています。ステップの最後には演習パートを用意しています。ぜひ自分でもコードを書いて Android アプリ開発を体験してみてください！
 
+## セットアップ
+
+演習を始める前に、以下の準備を行ってください。
+
+1. リポジトリの URL をコピー
+
+2. リポジトリのクローン
+
+すでにプロジェクトを開いている場合は、左上のアプリ名から「Clone Repository」を選択して、クローンしてください。
+
+URL: 1.で取得したリポジトリの URL を入力してください。
+Directory: リポジトリを保存する場所を選択してください。
+
+Clone をクリックすると、リポジトリのクローンが始まります。
+
+2. プロジェクトを開く
+
+This Window を選択してプロジェクトを開いてください。
+
+※ Android Studio でプロジェクトを開いていない場合は、起動した際に表示される以下の画面から「Clone Repository」を選択してください。すでにクローンしたリポジトリを開きたい場合は、「Open」を選択してください。
+
 ## Step 0 : Jetpack Compose の基本について学習する
 
 今回の演習では、Jetpack Compose（以下、Compose）を使ったモダンな方法で UI を実装していきます。まずは Compose について学習しましょう。
@@ -2932,16 +2953,16 @@ fun onLaunchedTest() {
             stars = 3,
         ),
     )
-  
+
     val viewModel = HomeViewModel(
         repository = FakeGithubRepoRepository(
             repos = repos,
             bookmarkedRepos = emptyList(),
         ),
     )
-  
+
     viewModel.onLaunched()
-  
+
     assertEquals(
         HomeUiState(
             repos = repos,
