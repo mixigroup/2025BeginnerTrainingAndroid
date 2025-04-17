@@ -484,7 +484,7 @@ Finish をクリックします。システムイメージの DL が始まった
 
 **USB で接続する**
 
-USB をお持ちの方は PC と実機を接続してください。接続できると以下のように接続したデバイス情報が表示されると思います。
+USB ケーブルをお持ちの方は PC と実機を接続してください。接続できると以下のように接続したデバイス情報が表示されると思います。
 
 ![image](https://github.com/user-attachments/assets/4f19b78e-b4c5-47f1-9123-a8f1b68cc8cc)
 
@@ -954,12 +954,13 @@ Box(
 早速リポジトリの情報を表示できるようにしましょう。プレビューで確認できれば ok です。その責務を担うコンポーネントは`RepoListItem`として定義することにします。
 
 ```kotlin
-// I/F
 @Composable
 fun RepoListItem(
     repo: Repo,
     modifier: Modifier = Modifier,
-)
+) {
+    // ToDo: repo.title, repo.description, repo.stars を表示する
+}
 ```
 
 `Repo`は表示するリポジトリの情報を表現するクラスです。`Repo`には以下の情報を含ませています。
@@ -1097,7 +1098,7 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/main...referenc
 
 </details>
 
-### テクニック
+### Tips: プレビュー用のデータセットを作成する
 
 プレビューは複数定義できるので、概要がない場合の UI もプレビューで表示できるようにしたいです。もう一つプレビュー用の Composable 関数を追加しても良いですが、プレビューで確認したい状態が増える度に追加するのも少し面倒です。そんな時は`PreviewParameterProvider`を使うと楽にできます。
 
@@ -1354,7 +1355,8 @@ scope.cancel()
 
 **スレッドの切り替え**
 
-Android ではメインスレッドから別のスレッドに切り替えて、重たい処理をしたいケースがよくあります。そんな時は、`Dispatchers.IO`を使うと良いです。
+`withContext`を使うと、処理を実行するスレッドを切り替えることができます。
+例えばサーバーとの通信やファイルの読み書きのような処理を行いたい場合は、`Dispatchers.IO`を指定することで I/O 専用のスレッドに切り替えることができます。
 
 ```kotlin
 scope.launch {
@@ -1367,7 +1369,7 @@ scope.launch {
 }
 ```
 
-スレッドの切り替えをうっかり忘れてしまうかもしれません。そのようなミスを防ぐために、スレッドを切り替える処理を隠蔽するよう実装することが推奨されています（メインセーフ）。
+スレッドの切り替えをうっかり忘れてしまうかもしれません。そのようなミスを防ぐために、スレッドを切り替える処理を隠蔽するよう実装することが推奨されています（この考え方をメインセーフと呼びます）。
 
 ```kotlin
 suspend fun runHeavyTask() = withContext(Dispatchers.IO) {
@@ -1646,13 +1648,13 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-
 
 - テストが書きやすくなる
   - UI 層とデータ層を分離することで、それぞれの層に特化した単体テストを書きやすくなります
-  - これにより、個々のコンポーネントの振る舞いを独立して検証でき、テストの網羅性と信頼性が向上します。
+  - これにより、個々のコンポーネントの振る舞いを独立して検証でき、テストの網羅性と信頼性が向上します
 - 再利用性の向上
   - 複数の機能で共通して利用される処理を切り出すことで、同じ処理を何度も実装する必要がなくなります
   - プログラムの再利用性を高めることで開発効率が向上できます
 - 保守性の向上
   - 各層やコンポーネント間の結合度を下げることで、修正や機能追加の影響範囲を狭めることができます
-  - これにより、変更に強い柔軟な構造を実現できます。
+  - これにより、変更に強い柔軟な構造を実現できます
 
 ### Android アプリの推奨アーキテクチャ
 
@@ -1687,20 +1689,18 @@ UI の表示処理を主に担うレイヤーです。UI 層はさらに以下�
 
 ```kotlin
 data class MainUiState(
-    val items: List<String>,
+    val items: List<String> = emptyList(),
 )
 ```
 
 State Holder である ViewModel では UI の状態を UI State として公開します。
 
 ```kotlin
-class MainViewModel: ViewModel() {
-    var uiState = MutableStateFlow(
-        MainUiState(
-            items = emptyList(),
-        )
-    )
-        private set
+class MainViewModel : ViewModel() {
+    // 変更可能な StateFlow は private にして、外部からは変更できないようにする
+    private val _uiState = MutableStateFlow(MainUiState())
+    // 外部には変更不可な StateFlow を公開する
+    val uiState = _uiState.asStateFlow()
 }
 
 ```
@@ -1723,7 +1723,7 @@ ViewModel の生成は下記のようにします。
 ※ `androidx.lifecycle:lifecycle-viewmodel-compose` ライブラリの依存を追加する必要があります。
 
 ```kotlin
-val viewModel: MaianViewModel = ViewModel()
+val viewModel: MainViewModel = ViewModel()
 ```
 
 **Data 層**
@@ -1753,7 +1753,7 @@ class Repository(
 )
 ```
 
-データの操作には時間がかかります。Repository で公開する API は suspend 関数にして、コルーチン内で呼び出すことを強制させる方が良いでしょう。また、呼び出し元でスレッドを意識させないようにしてあげるとミスを防げます（この考え方をメインセーフと呼びます）。
+データの操作には時間がかかります。Repository で公開する API は suspend 関数にして、コルーチン内で呼び出すことを強制させる方が良いでしょう。また、呼び出し元でスレッドを意識させないようにしてあげるとミスを防げます（メインセーフ）。
 
 ```kotlin
 class Repository(
@@ -1844,8 +1844,8 @@ Composable 関数にあるロジックを ViewModel で置き換えていきま�
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
 ) {
-    val viewModel: HomeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -1983,9 +1983,10 @@ class ViewModel() {
 リスナーは下記のように渡せます。
 
 ```kotlin
-// どっちでもリスナーを渡せる
-Button(onClick = viewModel::onClick)
+// ラムダ式で渡す
 Button(onClick = { viewModel.onClick() })
+// 関数参照で渡す
+Button(onClick = viewModel::onClick)
 ```
 
 ### リソースを取り込む
@@ -2155,7 +2156,7 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-
 
 ## Step 7 : データを端末内に永続化する
 
-今の状態では、アプリを終了した時にブックマークしたリポジトリの情報が失われてしまいます。データを永続化してアプリを再起動しても、ブックマークしたリポジトリが消去されないようにしてみましょう。
+今の状態では、アプリを終了した時にブックマークしたリポジトリの情報が失われてしまいます。データを永続化して、アプリを再起動してもブックマークしたリポジトリが消去されないようにしてみましょう。
 
 ### 永続化の方法
 
@@ -2164,7 +2165,7 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/compare/reference/step-
 | 保存先       | ライブラリ名      | 使い分け                                                           |
 | ------------ | ----------------- | ------------------------------------------------------------------ |
 | ファイル     | Jetpack DataStore | 保存するデータが設定などのフラグやデータ量が少ない時に使う         |
-| データベース | Jetpack Room      | 保存するデータが大量で部分更新や参照生合性をサポートしたい時に使う |
+| データベース | Jetpack Room      | 保存するデータが大量で部分更新や参照整合性をサポートしたい時に使う |
 
 ### Jetpack Room について
 
@@ -2216,7 +2217,7 @@ interface ItemDao {
     suspend fun findAll(): List<RepoEntity>
 
     @Delete
-    suspend fun delete()
+    suspend fun delete(item: ItemEntity)
 }
 ```
 
@@ -2247,7 +2248,7 @@ val appDatabase = Room.databaseBuilder(
                         "app_database",
                   ).build()
 
-val dao = appDatabase.repoDao()
+val dao = appDatabase.itemDao()
 ```
 
 ### ファクトリの実装
@@ -2258,7 +2259,7 @@ DAO のインスタンスを注入するために、簡易的な Factory を実�
 object LocalDataSourceFactory
 ```
 
-DAO のインスタンスを作りには、Application オブジェクトが必要です。`Application`オブジェクトはカスタムで定義できる`MyApplication`クラスの`onCreate`で取得することにします。
+DAO のインスタンスを作るには、Application オブジェクトが必要です。`Application`オブジェクトはカスタムで定義できる`MyApplication`クラスの`onCreate`で取得することにします。
 
 ※ Application オブジェクト : アプリのパッケージ名など全体的な設定が含まれるオブジェクトです
 ※ `MyApplication` : Application は一番最初にインスタンスが作られます。これを継承して自作の Application クラスを作成できます。初期化処理などが実装される場合が多いです。
@@ -2288,6 +2289,12 @@ class MyApplication: Application() {
 ```
 
 `MyAppllication` は `AndroidManifest.xml` に登録する必要があります。
+
+```xml
+<application
+    android:name=".MyApplication"
+    ... >
+```
 
 ### 演習
 
@@ -2693,7 +2700,7 @@ NavigationBar(modifier = modifier) {
                  Icon(
 ```
 
-アプリ下部に遷移バーを表示したければ、前出した`Scaffold`を使います。`bottomBar`に Composable 関数を渡せばそれを下側に表示できます。
+アプリ下部に遷移バーを表示したければ、前述した`Scaffold`を使います。`bottomBar`に Composable 関数を渡せばそれを下側に表示できます。
 
 ```kotlin
 @Composable
@@ -2781,7 +2788,8 @@ class HomeViewModelTest {
 
 テストクラスの左側に表示されている ▶️ から実行できます。
 
-class の横にある方はそのクラスのすべてのテストを実行します。テストメソッドごとに表示されている方は、紐づいているテストだけを実行できます。
+class の横にある ▶️ をクリックすると、そのクラスのすべてのテストを実行できます。
+テストメソッドの横にある ▶️ をクリックすると、そのテストだけを実行できます。
 
 <table>
 <tr>
@@ -2911,36 +2919,36 @@ class HomeViewModelTest {}
 ```kotlin
 @Test
 fun onLaunchedTest() {
-		val repos = listOf(
-		        Repo(
-		            id = 1,
-		            name = "fake repo1",
-		            stars = 12,
-		        ),
-		        Repo(
-		            id = 2,
-		            description = "this is fake repository",
-		            name = "fake repo2",
-		            stars = 3,
-		        ),
-	  )
-
-	  val viewModel = HomeViewModel(
-	        repository = FakeGithubRepoRepository(
-              repos = repos,
-              bookmarkedRepos = emptyList(),
-          ),
-	  )
-
-	  viewModel.onLaunched()
-
-		assertEquals(
-		    HomeUiState(
-		        repos = repos,
-		        bookmarkedRepos = emptySet(),
-		    ),
-		    viewModel.uiState.value,
-		)
+    val repos = listOf(
+        Repo(
+            id = 1,
+            name = "fake repo1",
+            stars = 12,
+        ),
+        Repo(
+            id = 2,
+            description = "this is fake repository",
+            name = "fake repo2",
+            stars = 3,
+        ),
+    )
+  
+    val viewModel = HomeViewModel(
+        repository = FakeGithubRepoRepository(
+            repos = repos,
+            bookmarkedRepos = emptyList(),
+        ),
+    )
+  
+    viewModel.onLaunched()
+  
+    assertEquals(
+        HomeUiState(
+            repos = repos,
+            bookmarkedRepos = emptySet(),
+        ),
+        viewModel.uiState.value,
+    )
 }
 ```
 
@@ -2990,26 +2998,26 @@ class HomeViewModelTest {
  @Test
 -fun onLaunchedTest() {
 +fun onLaunchedTest() = runTest {
-                val repos = listOf(
-                        Repo(
-                            id = 1,
+    val repos = listOf(
+        Repo(
+            id = 1,
 ```
 
 あとは`assert`の前に時間を進める API を呼んであげれば良いです。
 
 ```diff
-          )
+     )
 
-       viewModel.onLaunched()
-+      advanceUntilIdle()
+     viewModel.onLaunched()
++    advanceUntilIdle()
 
-       assertEquals(
-          HomeUiState(
-              repos = repos,
-              bookmarkedRepos = emptySet(),
-          ),
-          viewModel.uiState.value,
-       )
+     assertEquals(
+         HomeUiState(
+             repos = repos,
+             bookmarkedRepos = emptySet(),
+         ),
+         viewModel.uiState.value,
+     )
  }
 ```
 
@@ -3056,7 +3064,10 @@ https://github.com/mixigroup/2025BeginnerTrainingAndroid/tree/reference/step-10 
 時間があれば、差分を眺めて普通の Android アプリとはどう違うかを調べてみましょう！
 
 ※ ブランチを切り替えたら Sync してください（赤矢印）
+
 ※ Android アプリをビルド&インストールするに は composeApp、iOS は iosApp を選択してください
+
+![スクリーンショット 2025-04-15 14 27 00](https://github.com/user-attachments/assets/f8d82771-f652-4026-9c33-1af994fefc0a)
 
 # 補足
 
