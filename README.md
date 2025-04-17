@@ -506,6 +506,47 @@ Wi-Fi で接続する場合は、青矢印の部分をクリックします。
 
 デバイスの画面にテキストが表示されれば OK です。
 
+## プロジェクトの構成
+
+アプリのプロジェクトは以下のような構成になっています。
+
+- manifests（赤枠）
+  - アプリ名やアイコン、使用するパーミッションなどの設定を記述するファイルです
+- kotlin+java（黄枠）
+  - アプリのソースコードを記述する場所です
+- res（青枠）
+  - 画像やレイアウト、テキストなどのリソースを記述する場所です
+- Gradle Scripts（紫枠）
+  - ライブラリの管理やビルドの設定を記述する場所です
+
+実際のディレクトリツリーのような UI で表示するには、Project を選択してください。
+
+## ログの表示
+
+Log クラスを使うとログを出力できます。
+
+```kotlin
+import android.util.Log
+
+Log.e("tagName", "call onCreate")
+```
+
+Logcat で出力されたログを確認できます。
+
+フィルターをかけるとログを絞り込むことができます。
+
+また、ログにはレベルをつけることができます。
+
+```kotlin
+import android.util.Log
+
+Log.v("tagName", "call onCreate") // Verbose
+Log.i("tagName", "call onCreate") // Info
+Log.d("tagName", "call onCreate") // Debug
+Log.w("tagName", "call onCreate") // Warning
+Log.e("tagName", "call onCreate") // Error
+```
+
 # アプリ開発演習
 
 この章では、Github にある mixigroup のリポジトリを取得し、ブックマークできるアプリを作成します。
@@ -559,7 +600,6 @@ This Window を選択してプロジェクトを開いてください。
 ※ Android Studio でプロジェクトを開いていない場合は、起動した際に表示される以下の画面から「Clone Repository」を選択してください。すでにクローンしたリポジトリを開きたい場合は、「Open」を選択してください。
 
 ![スクリーンショット 2025-04-18 7 24 36](https://github.com/user-attachments/assets/decf81af-e570-4cd3-a051-e6e10c4c9a30)
-
 
 ## Step 0 : Jetpack Compose の基本について学習する
 
