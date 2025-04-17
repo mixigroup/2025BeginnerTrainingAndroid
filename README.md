@@ -550,9 +550,13 @@ Log.d("tagName", "call onCreate") // Debug
 Log.w("tagName", "call onCreate") // Warning
 Log.e("tagName", "call onCreate") // Error
 ```
+
 Logcat ではレベルごとに異なる色で表示されます。
 
 ![スクリーンショット 2025-04-18 8 29 43](https://github.com/user-attachments/assets/807f74d8-d7da-4fe8-9995-7f25b682de81)
+
+他にも色々な機能があります。公式ドキュメントで紹介されているので、余裕があれば見てみてください。
+https://developer.android.com/studio/intro
 
 # アプリ開発演習
 
