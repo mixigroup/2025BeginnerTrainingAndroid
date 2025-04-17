@@ -519,11 +519,15 @@ Wi-Fi で接続する場合は、青矢印の部分をクリックします。
 - Gradle Scripts（紫枠）
   - ライブラリの管理やビルドの設定を記述する場所です
 
+![スクリーンショット 2025-04-18 7 54 52](https://github.com/user-attachments/assets/940ae8a7-9260-48b9-8306-25b7f4818198)
+
 実際のディレクトリツリーのような UI で表示するには、Project を選択してください。
+
+![スクリーンショット 2025-04-18 7 55 32](https://github.com/user-attachments/assets/fcb6c110-96b6-49cf-a64c-ba4cf4222a23)
 
 ## ログの表示
 
-Log クラスを使うとログを出力できます。
+`Log` クラスを使うとログを出力できます。
 
 ```kotlin
 import android.util.Log
@@ -531,9 +535,9 @@ import android.util.Log
 Log.e("tagName", "call onCreate")
 ```
 
-Logcat で出力されたログを確認できます。
+Logcat で出力されたログを確認できます。フィルターをかけるとログを絞り込むことができます。
 
-フィルターをかけるとログを絞り込むことができます。
+![スクリーンショット 2025-04-18 8 34 38](https://github.com/user-attachments/assets/2d5693ad-f136-4db3-ae5d-2e6758f56b1e)
 
 また、ログにはレベルをつけることができます。
 
@@ -546,6 +550,9 @@ Log.d("tagName", "call onCreate") // Debug
 Log.w("tagName", "call onCreate") // Warning
 Log.e("tagName", "call onCreate") // Error
 ```
+Logcat ではレベルごとに異なる色で表示されます。
+
+![スクリーンショット 2025-04-18 8 29 43](https://github.com/user-attachments/assets/807f74d8-d7da-4fe8-9995-7f25b682de81)
 
 # アプリ開発演習
 
