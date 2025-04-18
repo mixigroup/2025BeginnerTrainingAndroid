@@ -704,6 +704,7 @@ fun NotComposable() {
 実際のアプリでは`Activity`の`onCreate`で`setContent`という関数を使って、Composable 関数を呼び出せるようにします。
 
 ※ Activity : View をホストするコンテナのようなオブジェクト
+
 ※ onCreate : Activity のライフサイクルに応じて呼び出されるコールバックの一種。画面を開いた時に呼び出される、ぐらいの認識で OK
 
 ```kotlin
