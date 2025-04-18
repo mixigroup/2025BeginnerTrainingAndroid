@@ -1806,6 +1806,7 @@ val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 ```
 
 ViewModel の生成は下記のようにします。
+
 ※ `androidx.lifecycle:lifecycle-viewmodel-compose` ライブラリの依存を追加する必要があります。
 
 ```kotlin
